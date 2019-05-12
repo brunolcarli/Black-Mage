@@ -38,7 +38,7 @@ class NewsType(graphene.ObjectType):
     @classmethod
     def get_node(cls, info, id):
         return get_news(id=id)
-        
+
 
 class NewsConnection(graphene.relay.Connection):
     class Meta:
