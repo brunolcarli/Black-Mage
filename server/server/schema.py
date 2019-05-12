@@ -3,17 +3,20 @@ import graphql_jwt
 
 import chatbot.schema as chatbot
 import users.schema as users
+import news.schema as news
 
 queries = (
     graphene.ObjectType,
     chatbot.Query,
-    users.Query
+    users.Query,
+    news.Query
 )
 
 mutations = (
     graphene.ObjectType,
     chatbot.Mutation,
-    users.Mutation
+    users.Mutation,
+    news.Mutation
 )
 
 class Query(*queries):
