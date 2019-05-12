@@ -8,4 +8,5 @@ migrate:
 	python server/manage.py makemigrations
 	python server/manage.py migrate
 
-
+shell:
+	python server/manage.py shell	
