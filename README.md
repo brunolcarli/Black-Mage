@@ -4,11 +4,7 @@
 
 ## Installing and Running (Development)
 
-Step-by-Step
-
-First clone this repository to your local machine.
-
-Change your directory to the `core` folder inside the project.
+Clone this repository to your local machine.
 
 Make sure your in a activated virtual env, if not familiar with virtualenvs take a look
 at [this article](https://docs.python-guide.org/dev/virtualenvs/).
