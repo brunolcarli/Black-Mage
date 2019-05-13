@@ -52,9 +52,17 @@ class Query(object):
 
     node = graphene.relay.Node.Field()
 
-    # news = graphene.List(NewsType)
     news = graphene.relay.ConnectionField(
-        NewsConnection
+        NewsConnection,
+        author=graphene.Int(
+            description="Author's integer ID."
+        ),
+        title_contains=graphene.String(
+            description='The title must contain...'
+        ),
+        body_contains=graphene.String(
+            description='Body text must contain...'
+        )
     )
 
     @access_required
@@ -63,8 +71,7 @@ class Query(object):
         retorna uma lista de noticias registradas
         no sistema.
         '''
-
-        return get_news()
+        return get_news(**kwargs)
 
 
 class CreateNews(graphene.relay.ClientIDMutation):
