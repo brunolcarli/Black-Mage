@@ -4,7 +4,7 @@
 
 > ~ Dawn of Souls instructions
 
-[Black Mage](https://finalfantasy.fandom.com/wiki/Black_Mage_(Final_Fantasy)) é o servidor [API](https://en.wikipedia.org/wiki/Application_programming_interface) que disponibilizará acesso aos dados para a plataforma do sistema Civil-Cultural. Inicilamente englibando o serviços básicos e posteriormente desacoplando-se para atuar como gateway de acesso aos serviços. 
+[Black Mage](https://finalfantasy.fandom.com/wiki/Black_Mage_(Final_Fantasy)) é o servidor [API](https://en.wikipedia.org/wiki/Application_programming_interface) que disponibilizará acesso aos dados para a plataforma do sistema Civil-Cultural. Inicilamente englobando o serviços básicos e posteriormente desacoplando-se para atuar como gateway de acesso aos serviços. 
 
 
 
