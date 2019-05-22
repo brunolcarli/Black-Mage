@@ -1,5 +1,4 @@
-| ![Generic badge](https://img.shields.io/badge/level-backend-black.svg) | [![Generic badge](https://img.shields.io/badge/docs-grey.svg)](https://gitlab.com/civil-cultural/black-mage/wikis/home) | ![Generic badge](https://img.shields.io/badge/status-under_development-yellow.svg) | ![Generic badge](https://img.shields.io/badge/progress-25%-green.svg) | 
-
+| ![Generic badge](https://img.shields.io/badge/level-backend-black.svg) |  ![Generic badge](https://img.shields.io/badge/status-under_development-yellow.svg) | [![Generic badge](https://img.shields.io/badge/docs-grey.svg)](https://gitlab.com/civil-cultural/black-mage/wikis/home) |
 # Black Mage (API Server)
 
 > "Although ill-suited for wielding weapons, Black Mages easily bend destructive black magic spells to their will."
