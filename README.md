@@ -1,4 +1,4 @@
-| [![Generic badge](https://img.shields.io/badge/level-backend-black.svg)](https://shields.io/) | [![Generic badge](https://img.shields.io/badge/status-under_development-yellow.svg)](https://shields.io/) | [![Generic badge](https://img.shields.io/badge/progress-25%-blue.svg)](https://shields.io/) | 
+| ![Generic badge](https://img.shields.io/badge/level-backend-black.svg) | [![Generic badge](https://img.shields.io/badge/docs-grey.svg)](https://gitlab.com/civil-cultural/black-mage/wikis/home) | ![Generic badge](https://img.shields.io/badge/status-under_development-yellow.svg) | ![Generic badge](https://img.shields.io/badge/progress-25%-green.svg) | 
 
 # Black Mage (API Server)
 
