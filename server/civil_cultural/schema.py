@@ -44,9 +44,14 @@ class TopicType(graphene.ObjectType):
     description = graphene.String()
     scope = graphene.String()
     creation_datetime = graphene.DateTime()
+    portal = graphene.Field(
+        PortalType
+    )
     # TODO - add Tags
     # TODO - add Articles
 
+    def resolve_portal(self, info, **kwargs):
+        return self.topic_portal
 
 class TopicConnection(graphene.relay.Connection):
     class Meta:
@@ -111,5 +116,82 @@ class CreatePortal(graphene.relay.ClientIDMutation):
             raise(exception)
 
 
+class CreateTopic(graphene.relay.ClientIDMutation):
+    '''
+        Creates a topic
+    '''
+    topic = graphene.Field(
+        TopicType,
+        description='Created topic data response.'
+    )
+
+    class Input:
+        name = graphene.String(
+            required=True,
+            description='Topic title.'
+        )
+        description = graphene.String(
+            description='Topic description.'
+        )
+        scope = graphene.String(
+            description='Topic focus and scope.'
+        )
+        portal = graphene.ID(
+            required=True,
+            description='Topic portal ID.'
+        )
+
+    # @access_required
+    def mutate_and_get_payload(self, info, **_input):
+        # captura dos inputs
+        name = _input.get('name')
+        description = _input.get('description', '')
+        scope = _input.get('scope', '')
+        portal_id = _input.get('portal')
+
+        _, portal_id = from_global_id(portal_id)
+
+        try:
+            portal = Portal.objects.get(id=portal_id)
+        except Portal.DoesNotExist:
+            raise Exception(
+                'Given portal does not exist!'
+            )
+
+        try:
+            topic = Topic.objects.create(
+                name=name,
+                description=description,
+                scope=scope,
+                topic_portal=portal
+            )
+            topic.save()
+            return CreateTopic(topic)
+
+        except Exception as exception:
+            raise(exception)
+
+
+# class CreateTopic(graphene.relay.ClientIDMutation):
+#     topic = graphene.Field(TopicType)
+#     class Input:
+#         name = graphene.String(
+#             required=True,
+#             description='Topic title.'
+#         )
+#         description = graphene.String(
+#             description='Topic description.'
+#         )
+#         scope = graphene.String(
+#             description='Topic focus and scope.'
+#         )
+#         portal = graphene.ID(
+#             required=True,
+#             description='Topic portal ID.'
+#         )
+#     def mutate_and_get_payload(self, info, **_input):
+#         return CreateTopic()
+
 class Mutation:
     create_portal = CreatePortal.Field()
+    create_topic = CreateTopic.Field()
