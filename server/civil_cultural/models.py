@@ -38,6 +38,10 @@ class Topic(models.Model):
         auto_now_add=True
     )
     articles = models.ManyToManyField('civil_cultural.Article')
+    topic_portal = models.ForeignKey(
+        'civil_cultural.Portal',
+        on_delete=models.CASCADE,
+    )
     # TODO - add Tag
 
 
