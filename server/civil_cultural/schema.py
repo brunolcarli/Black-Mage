@@ -2,7 +2,7 @@ import graphene
 
 # models
 from users.schema import UserType
-from civil_cultural.models import Portal
+from civil_cultural.models import Portal, Topic
 
 # resolvers
 
@@ -33,6 +33,26 @@ class PortalConnection(graphene.relay.Connection):
         node = PortalType
 
 
+class TopicType(graphene.ObjectType):
+    '''
+        Defines a GraphQl Topic object.
+    '''
+    class Meta:
+        interfaces = (graphene.relay.Node,)
+
+    name = graphene.String()
+    description = graphene.String()
+    scope = graphene.String()
+    creation_datetime = graphene.DateTime()
+    # TODO - add Tags
+    # TODO - add Articles
+
+
+class TopicConnection(graphene.relay.Connection):
+    class Meta:
+        node = TopicType
+
+
 class Query(object):
     '''
         Queries for civil_cultural.
@@ -48,9 +68,18 @@ class Query(object):
         '''
             Returns all portals from civil cultural.
         '''
-        # portals = Portal.objects.all()
-        # return [portal for portal in portals]
         return Portal.objects.all()
+
+    topics = graphene.relay.ConnectionField(
+        TopicConnection
+    )
+
+    # @access_required
+    def resolve_topics(self, info, **kwargs):
+        '''
+            Returns all topics from civil cultural.
+        '''
+        return Topic.objects.all()
 
 
 class CreatePortal(graphene.relay.ClientIDMutation):
