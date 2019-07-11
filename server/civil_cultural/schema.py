@@ -20,12 +20,16 @@ class PortalType(graphene.ObjectType):
 
     name = graphene.String()
     founding_datetime = graphene.DateTime()
+    topics = graphene.ConnectionField('civil_cultural.schema.TopicConnection')
     # TODO - add Topics
     # TODO - add News
     # TODO - add Rules
     # TODO - add Chat
     # TODO - add Users
     # TODO - add Tags
+
+    def resolve_topics(self, info, **kwargs):
+        return self.topic_set.all()
 
 
 class PortalConnection(graphene.relay.Connection):
