@@ -1,8 +1,21 @@
-# Black Mage (API Server)
+<table align="center"><tr><td align="center" width="9999">
+<img src="https://gitlab.com/civil-cultural/black-mage/wikis/uploads/48519f3e4ce26ade568565256fa051bf/custom_2543_close_e09034f8-7345-4bb6-87d5-ae6c4fd33820.jpg" align="center" width="150" alt="Project icon">
+
+# Black Mage API
+
+[![Generic badge](https://img.shields.io/badge/docs-yellow.svg)](https://gitlab.com/civil-cultural/black-mage/wikis/home)
 
 > "Although ill-suited for wielding weapons, Black Mages easily bend destructive black magic spells to their will."
 
 > ~ Dawn of Souls instructions
+
+API Server
+</td></tr></table>
+
+<hr />
+
+## Black Mage (API Server)
+
 
 [Black Mage](https://finalfantasy.fandom.com/wiki/Black_Mage_(Final_Fantasy)) é o servidor [API](https://en.wikipedia.org/wiki/Application_programming_interface) que disponibilizará acesso aos dados para a plataforma do sistema Civil-Cultural. Inicilamente englibando o serviços básicos e posteriormente desacoplando-se para atuar como gateway de acesso aos serviços. 
 
