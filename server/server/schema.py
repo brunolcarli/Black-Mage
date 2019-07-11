@@ -1,20 +1,22 @@
 import graphene
 import graphql_jwt
 
-import chatbot.schema as chatbot
+# import chatbot.schema as chatbot
 import users.schema as users
 import news.schema as news
+import civil_cultural.schema as civil_cultural
 
 queries = (
     graphene.ObjectType,
-    chatbot.Query,
+    # chatbot.Query,
     users.Query,
-    news.Query
+    news.Query,
+    civil_cultural.Query,
 )
 
 mutations = (
     graphene.ObjectType,
-    chatbot.Mutation,
+    # chatbot.Mutation,
     users.Mutation,
     news.Mutation
 )
