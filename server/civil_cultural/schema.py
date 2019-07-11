@@ -51,3 +51,36 @@ class Query(object):
         # portals = Portal.objects.all()
         # return [portal for portal in portals]
         return Portal.objects.all()
+
+
+class CreatePortal(graphene.relay.ClientIDMutation):
+    '''
+        Creates a portal
+    '''
+    portal = graphene.Field(
+        PortalType,
+        description='Created portal data response.'
+    )
+
+    class Input:
+        name = graphene.String(description='Portal title.')
+
+    # @access_required
+    def mutate_and_get_payload(self, info, **_input):
+        # captura dos inputs
+        name = _input.get('name')
+
+        try:
+            portal = Portal.objects.create(
+                name=name,
+            )
+            portal.save()
+
+            return CreatePortal(portal)
+
+        except Exception as exception:
+            raise(exception)
+
+
+class Mutation:
+    create_portal = CreatePortal.Field()
