@@ -2,7 +2,7 @@ import graphene
 
 # models
 from users.schema import UserType
-from civil_cultural.models import Portal, Topic
+from civil_cultural.models import Portal, Topic, Article
 
 # resolvers
 
@@ -57,9 +57,41 @@ class TopicType(graphene.ObjectType):
     def resolve_portal(self, info, **kwargs):
         return self.topic_portal
 
+
 class TopicConnection(graphene.relay.Connection):
     class Meta:
         node = TopicType
+
+
+class ArticleType(graphene.ObjectType):
+    '''
+        Defines an Article GraphQl object.
+    '''
+    class Meta:
+        interfaces = (graphene.relay.Node,)
+
+    title = graphene.String()
+    publication_datetime = graphene.DateTime()
+    post_author = graphene.Field(
+        UserType,
+        description='News author.'
+    )
+    article_authors = graphene.List(
+        graphene.String
+    )
+    abstract = graphene.String()
+    body = graphene.String()
+    pro_votes = graphene.Int()
+    cons_votes = graphene.Int()
+    # TODO add questions
+    # TODO add tags
+    # TODO reports
+    # TODO similar suggestions
+
+
+class ArticleConnection(graphene.relay.Connection):
+    class Meta:
+        node = ArticleType
 
 
 class Query(object):
@@ -89,6 +121,15 @@ class Query(object):
             Returns all topics from civil cultural.
         '''
         return Topic.objects.all()
+
+    articles = graphene.relay.ConnectionField(
+        ArticleConnection
+    )
+
+    # @access_required
+    def resolve_articles(self, info, **kwargs):
+        return Article.objects.all()
+
 
 
 class CreatePortal(graphene.relay.ClientIDMutation):
@@ -175,26 +216,6 @@ class CreateTopic(graphene.relay.ClientIDMutation):
         except Exception as exception:
             raise(exception)
 
-
-# class CreateTopic(graphene.relay.ClientIDMutation):
-#     topic = graphene.Field(TopicType)
-#     class Input:
-#         name = graphene.String(
-#             required=True,
-#             description='Topic title.'
-#         )
-#         description = graphene.String(
-#             description='Topic description.'
-#         )
-#         scope = graphene.String(
-#             description='Topic focus and scope.'
-#         )
-#         portal = graphene.ID(
-#             required=True,
-#             description='Topic portal ID.'
-#         )
-#     def mutate_and_get_payload(self, info, **_input):
-#         return CreateTopic()
 
 class Mutation:
     create_portal = CreatePortal.Field()
