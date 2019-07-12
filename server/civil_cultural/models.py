@@ -81,7 +81,13 @@ class Article(models.Model):
     questions = models.ManyToManyField('civil_cultural.Question')
     tags = models.ManyToManyField('civil_cultural.Tag')
     reports = models.ManyToManyField('civil_cultural.Report')
-    similar_suggestions = models.ManyToManyField('civil_cultural.SimilarSuggestion')
+    similar_suggestions = models.ManyToManyField(
+        'civil_cultural.SimilarSuggestion'
+    )
+    published_topic= models.ForeignKey(
+        'civil_cultural.Topic',
+        on_delete=models.CASCADE
+    )
 
 
 class SimilarSuggestion(models.Model):
