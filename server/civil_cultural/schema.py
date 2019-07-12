@@ -52,10 +52,15 @@ class TopicType(graphene.ObjectType):
         PortalType
     )
     # TODO - add Tags
-    # TODO - add Articles
+    articles = graphene.List(
+        'civil_cultural.schema.ArticleType'
+    )
 
     def resolve_portal(self, info, **kwargs):
         return self.topic_portal
+
+    def resolve_articles(self, info, **kwargs):
+        return self.article_set.all()
 
 
 class TopicConnection(graphene.relay.Connection):
@@ -71,7 +76,7 @@ class ArticleType(graphene.ObjectType):
         interfaces = (graphene.relay.Node,)
 
     title = graphene.String()
-    publication_datetime = graphene.DateTime()
+    publication_date = graphene.DateTime()
     post_author = graphene.Field(
         UserType,
         description='News author.'
@@ -83,11 +88,14 @@ class ArticleType(graphene.ObjectType):
     body = graphene.String()
     pro_votes = graphene.Int()
     cons_votes = graphene.Int()
+    references = graphene.String()
     # TODO add questions
     # TODO add tags
     # TODO reports
     # TODO similar suggestions
 
+    def resolve_article_authors(self, info, **kwargs):
+        return [author for author in self.article_authors.split(';')]
 
 class ArticleConnection(graphene.relay.Connection):
     class Meta:
@@ -129,7 +137,6 @@ class Query(object):
     # @access_required
     def resolve_articles(self, info, **kwargs):
         return Article.objects.all()
-
 
 
 class CreatePortal(graphene.relay.ClientIDMutation):
@@ -217,6 +224,77 @@ class CreateTopic(graphene.relay.ClientIDMutation):
             raise(exception)
 
 
+class CreateArticle(graphene.relay.ClientIDMutation):
+    '''
+        Creates an Article
+    '''
+    article = graphene.Field(
+        ArticleType,
+        description='Created article data response.'
+    )
+
+    class Input:
+        title = graphene.String(
+            requried=True,
+            description='Article title.'
+        )
+        article_authors = graphene.List(
+            graphene.String,
+            required=True
+        )
+        abstract = graphene.String()
+        body = graphene.String(
+            requried=True
+        )
+        references = graphene.String(
+            required=True
+        )
+        topic = graphene.ID(
+            required=True
+        )
+
+    @access_required
+    def mutate_and_get_payload(self, info, **_input):
+        # captura dos inputs
+        title = _input.get('title')
+        article_authors = _input.get('article_authors', '')
+        abstract = _input.get('abstract')
+        body = _input.get('body')
+        references = _input.get('references')
+        topic = _input.get('topic')
+        _, topic_id = from_global_id(topic)
+
+        authors = ';'.join(author for author in article_authors)
+
+        # identifica o usuario
+        user = info.context.user
+
+        try:
+            topic = Topic.objects.get(
+                id=topic_id
+            )
+        except Topic.DoesNotExist:
+            raise Exception('Given topic does not exists.')
+
+        try:
+            article = Article.objects.create(
+                title=title,
+                abstract=abstract,
+                body=body,
+                references=references,
+                post_author=user,
+                article_authors=authors,
+                published_topic=topic
+            )
+            article.save()
+
+            return CreateArticle(article)
+
+        except Exception as exception:
+            raise(exception)
+
+
 class Mutation:
     create_portal = CreatePortal.Field()
     create_topic = CreateTopic.Field()
+    create_Article = CreateArticle.Field()
