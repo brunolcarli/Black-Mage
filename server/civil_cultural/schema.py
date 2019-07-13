@@ -2,7 +2,7 @@ import graphene
 
 # models
 from users.schema import UserType
-from civil_cultural.models import Portal, Topic, Article
+from civil_cultural.models import Portal, Topic, Article, Question
 
 # resolvers
 
@@ -11,6 +11,9 @@ from users.utils import access_required
 from graphql_relay import from_global_id
 
 
+###############################################################################
+# GraphQl Objects
+###############################################################################
 class PortalType(graphene.ObjectType):
     '''
         Defines a GraphQl Portal object.
@@ -79,7 +82,7 @@ class ArticleType(graphene.ObjectType):
     publication_date = graphene.DateTime()
     post_author = graphene.Field(
         UserType,
-        description='News author.'
+        description='User that published the article.'
     )
     article_authors = graphene.List(
         graphene.String
@@ -97,11 +100,39 @@ class ArticleType(graphene.ObjectType):
     def resolve_article_authors(self, info, **kwargs):
         return [author for author in self.article_authors.split(';')]
 
+
 class ArticleConnection(graphene.relay.Connection):
     class Meta:
         node = ArticleType
 
 
+class QuestionType(graphene.ObjectType):
+    '''
+        Defines an Question GraphQl object.
+        A question is related to a specific Article
+    '''
+    class Meta:
+        interfaces = (graphene.relay.Node,)
+
+    post_author = graphene.Field(
+        UserType,
+        description='User that published the question.'
+    )
+    text = graphene.String()
+    pro_votes = graphene.Int()
+    cons_votes = graphene.Int()
+    publish_datetime = graphene.DateTime()
+    article = graphene.Field('civil_cultural.schema.ArticleType')
+
+
+class QuestionConnection(graphene.relay.Connection):
+    class Meta:
+        node = QuestionType
+
+
+###############################################################################
+# Schema QUERY
+###############################################################################
 class Query(object):
     '''
         Queries for civil_cultural.
@@ -138,7 +169,17 @@ class Query(object):
     def resolve_articles(self, info, **kwargs):
         return Article.objects.all()
 
+    questions = graphene.relay.ConnectionField(
+        QuestionConnection
+    )
 
+    # @access_required
+    def resolve_questions(self, info, **kwargs):
+        return Question.objects.all()
+
+###############################################################################
+# MUTATION - Creates
+###############################################################################
 class CreatePortal(graphene.relay.ClientIDMutation):
     '''
         Creates a portal
@@ -294,6 +335,19 @@ class CreateArticle(graphene.relay.ClientIDMutation):
             raise(exception)
 
 
+###############################################################################
+# MUTATION - Update
+###############################################################################
+
+
+###############################################################################
+# MUTATION - Delete
+###############################################################################
+
+
+###############################################################################
+# Schema Mutation
+###############################################################################
 class Mutation:
     create_portal = CreatePortal.Field()
     create_topic = CreateTopic.Field()
