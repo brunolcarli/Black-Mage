@@ -127,6 +127,10 @@ class Question(models.Model):
     publish_datetime = models.DateTimeField(
         auto_now_add=True
     )
+    published_article = models.ForeignKey(
+        'civil_cultural.Article',
+        on_delete=models.CASCADE
+    )
     # answers = models.ManyToManyField('civil_cultural.Answer')
 
 
