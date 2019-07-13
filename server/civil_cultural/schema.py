@@ -124,6 +124,9 @@ class QuestionType(graphene.ObjectType):
     publish_datetime = graphene.DateTime()
     article = graphene.Field('civil_cultural.schema.ArticleType')
 
+    def resolve_article(self, info, **kwargs):
+        return self.published_article
+
 
 class QuestionConnection(graphene.relay.Connection):
     class Meta:
@@ -335,6 +338,55 @@ class CreateArticle(graphene.relay.ClientIDMutation):
             raise(exception)
 
 
+class CreateQuestion(graphene.relay.ClientIDMutation):
+    '''
+        Creates an Question on an Article
+    '''
+    question = graphene.Field(
+        QuestionType,
+        description='Created article data response.'
+    )
+
+    class Input:
+        text = graphene.String(
+            requried=True,
+            description='Question text.'
+        )
+        article = graphene.ID(
+            required=True
+        )
+
+    @access_required
+    def mutate_and_get_payload(self, info, **_input):
+        # captura dos inputs
+        text = _input.get('text')
+        article = _input.get('article')
+        _, article_id = from_global_id(article)
+
+        # identifica o usuario
+        user = info.context.user
+
+        try:
+            article = Article.objects.get(
+                id=article_id
+            )
+        except Article.DoesNotExist:
+            raise Exception('Given article does not exists.')
+
+        try:
+            question = Question.objects.create(
+                text=text,
+                post_author=user,
+                published_article=article
+            )
+            question.save()
+
+            return CreateQuestion(question)
+
+        except Exception as exception:
+            raise(exception)
+
+
 ###############################################################################
 # MUTATION - Update
 ###############################################################################
@@ -351,4 +403,5 @@ class CreateArticle(graphene.relay.ClientIDMutation):
 class Mutation:
     create_portal = CreatePortal.Field()
     create_topic = CreateTopic.Field()
-    create_Article = CreateArticle.Field()
+    create_article = CreateArticle.Field()
+    create_question = CreateQuestion.Field()
