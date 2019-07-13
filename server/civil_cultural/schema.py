@@ -11,9 +11,9 @@ from users.utils import access_required
 from graphql_relay import from_global_id
 
 
-###############################################################################
+##########################################################################
 # GraphQl Objects
-###############################################################################
+##########################################################################
 class PortalType(graphene.ObjectType):
     '''
         Defines a GraphQl Portal object.
@@ -92,13 +92,18 @@ class ArticleType(graphene.ObjectType):
     pro_votes = graphene.Int()
     cons_votes = graphene.Int()
     references = graphene.String()
-    # TODO add questions
+    questions = graphene.List(
+        'civil_cultural.schema.QuestionType'
+    )
     # TODO add tags
     # TODO reports
     # TODO similar suggestions
 
     def resolve_article_authors(self, info, **kwargs):
         return [author for author in self.article_authors.split(';')]
+
+    def resolve_questions(self, info, **kwargs):
+        return self.question_set.all()
 
 
 class ArticleConnection(graphene.relay.Connection):
@@ -133,9 +138,9 @@ class QuestionConnection(graphene.relay.Connection):
         node = QuestionType
 
 
-###############################################################################
+##########################################################################
 # Schema QUERY
-###############################################################################
+##########################################################################
 class Query(object):
     '''
         Queries for civil_cultural.
@@ -180,9 +185,9 @@ class Query(object):
     def resolve_questions(self, info, **kwargs):
         return Question.objects.all()
 
-###############################################################################
+##########################################################################
 # MUTATION - Creates
-###############################################################################
+##########################################################################
 class CreatePortal(graphene.relay.ClientIDMutation):
     '''
         Creates a portal
@@ -387,19 +392,19 @@ class CreateQuestion(graphene.relay.ClientIDMutation):
             raise(exception)
 
 
-###############################################################################
+##########################################################################
 # MUTATION - Update
-###############################################################################
+##########################################################################
 
 
-###############################################################################
+##########################################################################
 # MUTATION - Delete
-###############################################################################
+##########################################################################
 
 
-###############################################################################
+##########################################################################
 # Schema Mutation
-###############################################################################
+##########################################################################
 class Mutation:
     create_portal = CreatePortal.Field()
     create_topic = CreateTopic.Field()
