@@ -2,7 +2,8 @@ import graphene
 
 # models
 from users.schema import UserType
-from civil_cultural.models import Portal, Topic, Article, Question, Tag, Rule
+from civil_cultural.models import (Portal, Topic, Article, Question, Tag, Rule,
+                                    SimilarSuggestion)
 
 # resolvers
 
@@ -177,6 +178,29 @@ class RuleConnection(graphene.relay.Connection):
         node = RuleType
 
 
+class SimilarSuggestionType(graphene.ObjectType):
+    '''
+        Defines an Similar Suggestion GraphQl object.
+    '''
+    class Meta:
+        interfaces = (graphene.relay.Node,)
+
+    post_author = graphene.Field(
+        UserType
+    )
+    description = graphene.String()
+    link = graphene.String(required=True)
+    pro_votes = graphene.Int()
+    cons_votes = graphene.Int()
+    publish_datetime = graphene.DateTime()
+
+
+
+class SimilarSuggestionConnection(graphene.relay.Connection):
+    class Meta:
+        node = SimilarSuggestionType
+
+
 ##########################################################################
 # Schema QUERY
 ##########################################################################
@@ -235,6 +259,14 @@ class Query(object):
     # @access_required
     def resolve_rules(self, info, **kwargs):
         return Rule.objects.all()
+
+    similar_suggestions = graphene.relay.ConnectionField(
+        SimilarSuggestionConnection
+    )
+
+    # @access_required
+    def resolve_similar_suggestions(self, info, **kwargs):
+        return SimilarSuggestion.objects.all()
 
 
 ##########################################################################
