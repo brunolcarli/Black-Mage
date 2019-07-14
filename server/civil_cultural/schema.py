@@ -2,7 +2,7 @@ import graphene
 
 # models
 from users.schema import UserType
-from civil_cultural.models import Portal, Topic, Article, Question
+from civil_cultural.models import Portal, Topic, Article, Question, Tag
 
 # resolvers
 
@@ -24,7 +24,6 @@ class PortalType(graphene.ObjectType):
     name = graphene.String()
     founding_datetime = graphene.DateTime()
     topics = graphene.ConnectionField('civil_cultural.schema.TopicConnection')
-    # TODO - add Topics
     # TODO - add News
     # TODO - add Rules
     # TODO - add Chat
@@ -138,6 +137,23 @@ class QuestionConnection(graphene.relay.Connection):
         node = QuestionType
 
 
+class TagType(graphene.ObjectType):
+    '''
+        Defines an Tag GraphQl object.
+        A tag is related to a specific subject matter.
+        Can be used to filter and group objects.
+    '''
+    class Meta:
+        interfaces = (graphene.relay.Node,)
+
+    reference = graphene.String()
+
+
+class TagConnection(graphene.relay.Connection):
+    class Meta:
+        node = TagType
+
+
 ##########################################################################
 # Schema QUERY
 ##########################################################################
@@ -184,6 +200,13 @@ class Query(object):
     # @access_required
     def resolve_questions(self, info, **kwargs):
         return Question.objects.all()
+
+    tags = graphene.relay.ConnectionField(TagConnection) 
+
+    # @access_required
+    def resolve_tags(self, info, **kwargs):
+        return Tag.objects.all()
+
 
 ##########################################################################
 # MUTATION - Creates
