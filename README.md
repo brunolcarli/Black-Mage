@@ -49,3 +49,6 @@ make run
 The system will be disponible at `localhost:8000/graphql/`
 
 
+### Dev Demo
+
+A demo version for development access is available [here](https://black-mage-devel--brunolcarli.repl.co/graphql/)!
