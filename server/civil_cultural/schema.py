@@ -415,6 +415,38 @@ class CreateQuestion(graphene.relay.ClientIDMutation):
             raise(exception)
 
 
+class CreateTag(graphene.relay.ClientIDMutation):
+    '''
+        Creates an Question on an Article
+    '''
+    tag = graphene.Field(
+        TagType,
+        description='Created Tag data.'
+    )
+
+    class Input:
+        reference = graphene.String(
+            required=True
+        )
+
+    def mutate_and_get_payload(self, info, **_input):
+        reference = _input.get('reference')
+
+        try:
+            tag = Tag.objects.create(
+                reference=reference
+            )
+            tag.save()
+            return CreateTag(tag)
+
+        # TODO - handle the right exception when the time comes
+        except Exception:    
+            raise Exception(
+                "Impossible to create this tag. \
+                Maybe this reference already exists."
+            )
+
+
 ##########################################################################
 # MUTATION - Update
 ##########################################################################
@@ -433,3 +465,4 @@ class Mutation:
     create_topic = CreateTopic.Field()
     create_article = CreateArticle.Field()
     create_question = CreateQuestion.Field()
+    create_tag = CreateTag.Field()
