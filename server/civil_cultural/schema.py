@@ -2,7 +2,7 @@ import graphene
 
 # models
 from users.schema import UserType
-from civil_cultural.models import Portal, Topic, Article, Question, Tag
+from civil_cultural.models import Portal, Topic, Article, Question, Tag, Rule
 
 # resolvers
 
@@ -25,13 +25,16 @@ class PortalType(graphene.ObjectType):
     founding_datetime = graphene.DateTime()
     topics = graphene.ConnectionField('civil_cultural.schema.TopicConnection')
     # TODO - add News
-    # TODO - add Rules
+    rules = graphene.ConnectionField('civil_cultural.schema.RuleConnection')
     # TODO - add Chat
     # TODO - add Users
     # TODO - add Tags
 
     def resolve_topics(self, info, **kwargs):
         return self.topic_set.all()
+
+    def resolve_rules(self, info, **kwargs):
+        return self.rule_set.all()
 
 
 class PortalConnection(graphene.relay.Connection):
@@ -154,6 +157,26 @@ class TagConnection(graphene.relay.Connection):
         node = TagType
 
 
+class RuleType(graphene.ObjectType):
+    '''
+        Defines an Rule GraphQl object.
+    '''
+    class Meta:
+        interfaces = (graphene.relay.Node,)
+
+    description = graphene.String()
+    creation_date = graphene.Date()
+    portal = graphene.Field(PortalType)
+
+    def resolve_portal(self, info, **kwargs):
+        return self.portal_reference
+
+
+class RuleConnection(graphene.relay.Connection):
+    class Meta:
+        node = RuleType
+
+
 ##########################################################################
 # Schema QUERY
 ##########################################################################
@@ -206,6 +229,12 @@ class Query(object):
     # @access_required
     def resolve_tags(self, info, **kwargs):
         return Tag.objects.all()
+
+    rules = graphene.relay.ConnectionField(RuleConnection)
+
+    # @access_required
+    def resolve_rules(self, info, **kwargs):
+        return Rule.objects.all()
 
 
 ##########################################################################
@@ -417,7 +446,7 @@ class CreateQuestion(graphene.relay.ClientIDMutation):
 
 class CreateTag(graphene.relay.ClientIDMutation):
     '''
-        Creates an Question on an Article
+        Creates a Tag
     '''
     tag = graphene.Field(
         TagType,
@@ -429,6 +458,7 @@ class CreateTag(graphene.relay.ClientIDMutation):
             required=True
         )
 
+    # @access_required
     def mutate_and_get_payload(self, info, **_input):
         reference = _input.get('reference')
 
@@ -444,6 +474,46 @@ class CreateTag(graphene.relay.ClientIDMutation):
             raise Exception(
                 "Impossible to create this tag. \
                 Maybe this reference already exists."
+            )
+
+
+class CreateRule(graphene.relay.ClientIDMutation):
+    '''
+        Creates a Rule
+    '''
+    rule = graphene.Field(RuleType)
+
+    class Input:
+        description = graphene.Field(
+            graphene.String,
+            required=True
+        )
+        portal = graphene.ID(
+            required=True
+        )
+
+    # @access_required
+    def mutate_and_get_payload(self, info, **_input):
+        description = _input.get('description')
+        portal_id = _input.get('portal')
+        _, portal_id = from_global_id(portal_id)
+
+        try:
+            portal = Portal.objects.get(id=portal_id)
+        except Portal.DoesNotExist:
+            raise Exception('The given Portal does not exist.')
+
+        try:
+            rule = Rule.objects.create(
+                description=description,
+                portal_reference=portal
+            )
+            rule.save()
+            return CreateRule(rule)
+        except Exception:    
+            raise Exception(
+                "Impossible to create this rule. \
+                Maybe it already exists."
             )
 
 
@@ -466,3 +536,4 @@ class Mutation:
     create_article = CreateArticle.Field()
     create_question = CreateQuestion.Field()
     create_tag = CreateTag.Field()
+    create_rule = CreateRule.Field()
