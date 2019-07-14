@@ -238,7 +238,7 @@ class Query(object):
 
 
 ##########################################################################
-# MUTATION - Creates
+# MUTATION - Create
 ##########################################################################
 class CreatePortal(graphene.relay.ClientIDMutation):
     '''
