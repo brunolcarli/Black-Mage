@@ -162,6 +162,10 @@ class Rule(models.Model):
     creation_date = models.DateField(
         auto_now_add=True
     )
+    portal_reference = models.ForeignKey(
+        Portal,
+        on_delete=models.CASCADE
+    )
 
 
 class Tag(models.Model):
