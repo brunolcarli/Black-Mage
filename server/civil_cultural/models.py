@@ -13,7 +13,7 @@ class Portal(models.Model):
         auto_now_add=True
     )
     topics = models.ManyToManyField('civil_cultural.Topic')
-    # TODO - add News
+    
     rules = models.ManyToManyField('civil_cultural.Rule')
     # TODO - add Chat
     # TODO - add Users
@@ -153,11 +153,13 @@ class Report(models.Model):
 
 
 class Rule(models.Model):
+    class Meta:
+        unique_together = ('description', 'portal_reference')
+
     description = models.CharField(
         max_length=400,
         blank=False,
         null=False,
-        unique=True
     )
     creation_date = models.DateField(
         auto_now_add=True
@@ -175,3 +177,19 @@ class Tag(models.Model):
         null=False,
         unique=True
     )
+
+
+class News(models.Model):
+    '''
+    Modelo de dados para publicação de uma notícia.
+    '''
+    title = models.CharField(max_length=100, null=False, blank=False)
+    body = models.TextField(null=False, blank=False)
+    pro_votes = models.IntegerField(default=0)
+    cons_votes = models.IntegerField(default=0)
+    publication_date = models.DateTimeField(auto_now_add=True)
+    author = models.ForeignKey(
+        get_user_model(),
+        on_delete=models.PROTECT
+        )
+    portal_reference = models.ForeignKey(Portal, on_delete=models.CASCADE)
