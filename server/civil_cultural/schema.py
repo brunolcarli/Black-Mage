@@ -6,7 +6,6 @@ from civil_cultural.models import (Portal, Topic, Article, Question, Tag, Rule,
                                     SimilarSuggestion, News)
 
 # resolvers
-# from civil_cultural.resolvers import get_news
 
 # other stuff
 from users.utils import access_required
@@ -99,18 +98,23 @@ class ArticleType(graphene.ObjectType):
     pro_votes = graphene.Int()
     cons_votes = graphene.Int()
     references = graphene.String()
-    questions = graphene.List(
-        'civil_cultural.schema.QuestionType'
+    questions = graphene.ConnectionField(
+        'civil_cultural.schema.QuestionConnection'
     )
     # TODO add tags
     # TODO reports
-    # TODO similar suggestions
+    similar_suggestions = graphene.ConnectionField(
+        'civil_cultural.schema.SimilarSuggestionConnection'
+    )
 
     def resolve_article_authors(self, info, **kwargs):
         return [author for author in self.article_authors.split(';')]
 
     def resolve_questions(self, info, **kwargs):
         return self.question_set.all()
+
+    def resolve_similar_suggestions(self, info, **kwargs):
+        return self.similar_suggestions.all()
 
 
 class ArticleConnection(graphene.relay.Connection):
@@ -210,9 +214,15 @@ class NewsType(graphene.ObjectType):
     portal = graphene.Field(
         PortalType
     )
+    similar_suggestions = graphene.ConnectionField(
+        'civil_cultural.schema.SimilarSuggestionConnection'
+    )
 
     def resolve_portal(self, info, **Kwargs):
         return self.portal_reference
+
+    def resolve_similar_suggestions(self, info, **kwargs):
+        return self.similar_suggestions.all()
 
     # @classmethod
     # def get_node(cls, info, id):
@@ -692,6 +702,67 @@ class CreateNews(graphene.relay.ClientIDMutation):
             raise(exception)
 
 
+class CreateSimilarSuggestion(graphene.relay.ClientIDMutation):
+    '''
+        Creates a similar suggestion post.
+    '''
+    similar_suggestion = graphene.Field(
+        SimilarSuggestionType
+    )
+
+    class Input:
+        description = graphene.String()
+        link = graphene.String(required=True)
+        post_id = graphene.ID(
+            required=True
+        )
+
+    @access_required
+    def mutate_and_get_payload(self, info, **_input):
+        description = _input.get('description')
+        link = _input.get('link')
+        post_key = _input.get('post_id')
+
+        # identifica o usuario
+        user = info.context.user
+
+        # Manobra arriscada // risky trick // @mcgyver
+        post_type, post_id = from_global_id(post_key)
+        if post_type == 'NewsType':
+
+            try:
+                post = News.objects.get(id=post_id)
+            except News.DoesNotExist:
+                raise Exception('Given post does not exist.')
+
+        elif post_type == 'ArticleType':
+            try:
+                post = Article.objects.get(id=post_id)
+            except Article.DoesNotExist:
+                raise Exception('Given post does not exist.')
+
+        else:
+            raise Exception('Ivalid Post ID!')
+
+        try:
+            similar_suggestion = SimilarSuggestion.objects.create(
+                post_author=user,
+                description=description,
+                link=link,
+                post_key=post_key
+            )
+        except Exception as ex:
+            raise ex
+
+        try:
+            similar_suggestion.save()
+            post.similar_suggestions.add(similar_suggestion)
+            post.save()
+            return CreateSimilarSuggestion(similar_suggestion)
+        except Exception as ex:
+            raise ex
+
+
 ##########################################################################
 # MUTATION - Update
 ##########################################################################
@@ -787,6 +858,7 @@ class Mutation:
     create_tag = CreateTag.Field()
     create_rule = CreateRule.Field()
     ceate_news = CreateNews.Field()
+    create_similar_suggestion = CreateSimilarSuggestion.Field()
 
     # Update
     update_news = UpdateNews.Field()
