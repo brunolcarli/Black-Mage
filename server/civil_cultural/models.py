@@ -91,6 +91,9 @@ class Article(models.Model):
 
 
 class SimilarSuggestion(models.Model):
+    class Meta:
+        unique_together = ('link', 'post_key')
+
     post_author = models.ForeignKey(
         get_user_model(),
         on_delete=models.CASCADE,
@@ -102,13 +105,13 @@ class SimilarSuggestion(models.Model):
         max_length=500,
         blank=False,
         null=False,
-        unique=True
     )
     pro_votes = models.IntegerField(default=0)
     cons_votes = models.IntegerField(default=0)
     publish_datetime = models.DateTimeField(
         auto_now_add=True
     )
+    post_key = models.CharField(max_length=50)
 
 
 class Question(models.Model):
@@ -188,6 +191,7 @@ class News(models.Model):
     pro_votes = models.IntegerField(default=0)
     cons_votes = models.IntegerField(default=0)
     publication_date = models.DateTimeField(auto_now_add=True)
+    similar_suggestions = models.ManyToManyField(SimilarSuggestion)
     author = models.ForeignKey(
         get_user_model(),
         on_delete=models.PROTECT
