@@ -3,9 +3,10 @@ import graphene
 # models
 from users.schema import UserType
 from civil_cultural.models import (Portal, Topic, Article, Question, Tag, Rule,
-                                    SimilarSuggestion)
+                                    SimilarSuggestion, News)
 
 # resolvers
+# from civil_cultural.resolvers import get_news
 
 # other stuff
 from users.utils import access_required
@@ -25,7 +26,7 @@ class PortalType(graphene.ObjectType):
     name = graphene.String()
     founding_datetime = graphene.DateTime()
     topics = graphene.ConnectionField('civil_cultural.schema.TopicConnection')
-    # TODO - add News
+    news = graphene.ConnectionField('civil_cultural.schema.NewsConnection')
     rules = graphene.ConnectionField('civil_cultural.schema.RuleConnection')
     # TODO - add Chat
     # TODO - add Users
@@ -36,6 +37,9 @@ class PortalType(graphene.ObjectType):
 
     def resolve_rules(self, info, **kwargs):
         return self.rule_set.all()
+
+    def resolve_news(self, info, **kwargs):
+        return self.news_set.all()
 
 
 class PortalConnection(graphene.relay.Connection):
@@ -178,6 +182,48 @@ class RuleConnection(graphene.relay.Connection):
         node = RuleType
 
 
+class NewsType(graphene.ObjectType):
+    '''Representação de uma Noticia'''
+    class Meta:
+        interfaces = (graphene.relay.Node,)
+
+    # atributos
+    title = graphene.String(
+        description='News title.'
+    )
+    body = graphene.String(
+        description='News main content.'
+    )
+    pro_votes = graphene.Int(
+        description='Positive votes this news has received.'
+    )
+    cons_votes = graphene.Int(
+        description='Negative otes this news has received.'
+    )
+    publication_date = graphene.DateTime(
+        description='Publish datetime.'
+    )
+    author = graphene.Field(
+        UserType,
+        description='News author.'
+    )
+    portal = graphene.Field(
+        PortalType
+    )
+
+    def resolve_portal(self, info, **Kwargs):
+        return self.portal_reference
+
+    # @classmethod
+    # def get_node(cls, info, id):
+    #     return get_news(id=id)
+
+
+class NewsConnection(graphene.relay.Connection):
+    class Meta:
+        node = NewsType
+
+
 class SimilarSuggestionType(graphene.ObjectType):
     '''
         Defines an Similar Suggestion GraphQl object.
@@ -193,7 +239,6 @@ class SimilarSuggestionType(graphene.ObjectType):
     pro_votes = graphene.Int()
     cons_votes = graphene.Int()
     publish_datetime = graphene.DateTime()
-
 
 
 class SimilarSuggestionConnection(graphene.relay.Connection):
@@ -267,6 +312,58 @@ class Query(object):
     # @access_required
     def resolve_similar_suggestions(self, info, **kwargs):
         return SimilarSuggestion.objects.all()
+
+    news = graphene.relay.ConnectionField(
+        NewsConnection,
+        author=graphene.Int(
+            description="Author's integer ID."
+        ),
+        title_contains=graphene.String(
+            description='The title must contain...'
+        ),
+        body_contains=graphene.String(
+            description='Body text must contain...'
+        )
+    )
+
+    @access_required
+    def resolve_news(self, info, **kwargs):
+        '''
+        retorna uma lista de noticias registradas
+        no sistema.
+        '''
+        # filtros
+        author = kwargs.get('author')
+        title_contains = kwargs.get('title_contains')
+        body_contains = kwargs.get('body_contains')
+
+        # se fornecer filtro por autor, traz somente as noticias do autor
+        if author:
+            news = News.objects.filter(author=author)
+
+        else:
+            news = News.objects.all()
+
+            if title_contains and body_contains:
+                filtered_news = [
+                    n for n in news if title_contains.lower() in n.title.lower()
+                ]
+                filtered_news += [
+                    n for n in news if body_contains.lower() in n.body.lower()
+                ]
+                return filtered_news
+
+            else:
+                if title_contains and not body_contains:
+                    news = [
+                        n for n in news if title_contains.lower() in n.title.lower()
+                    ]
+
+                if body_contains and not title_contains:
+                    news = [
+                        n for n in news if body_contains.lower() in n.body.lower()
+                    ]
+        return news
 
 
 ##########################################################################
@@ -549,23 +646,150 @@ class CreateRule(graphene.relay.ClientIDMutation):
             )
 
 
+class CreateNews(graphene.relay.ClientIDMutation):
+    '''
+    Cria uma Noticia
+    '''
+    news = graphene.Field(
+        NewsType,
+        description='Created news data response.'
+    )
+
+    class Input:
+        title = graphene.String(description='News title.')
+        body = graphene.String(description='News main content.')
+        portal = graphene.ID(
+            required=True,
+            description='Topic portal ID.'
+        )
+
+    @access_required
+    def mutate_and_get_payload(self, info, **_input):
+        # captura dos inputs
+        title = _input.get('title')
+        body = _input.get('body')
+        portal_id = _input.get('portal')
+        _, portal_id = from_global_id(portal_id)
+
+        try:
+            portal = Portal.objects.get(id=portal_id)
+
+        except Portal.DoesNotExist:
+            raise Exception('The given portal does not exist.')
+
+        try:
+            news = News.objects.create(
+                title=title,
+                body=body,
+                author=info.context.user,
+                portal_reference=portal
+            )
+            news.save()
+
+            return CreateNews(news)
+
+        except Exception as exception:
+            raise(exception)
+
+
 ##########################################################################
 # MUTATION - Update
 ##########################################################################
+class UpdateNews(graphene.relay.ClientIDMutation):
+    '''
+        Updates a published News.
+    '''
+    news = graphene.Field(
+        NewsType,
+        description='Updated news data response.'
+    )
+
+    class Input:
+        title = graphene.String(description='News title.', required=False)
+        body = graphene.String(description='News main content.', requried=False)
+        id = graphene.ID(description='News ID.', required=True)
+
+    @access_required
+    def mutate_and_get_payload(self, info, **_input):
+        # captura os inputs
+        title = _input.get('title')
+        body = _input.get('body')
+        _, id = from_global_id(_input.get('id'))
+
+        # identifica o usuario
+        user = info.context.user
+
+        # recupera o objeto do banco de dados
+        try:
+            news = News.objects.get(id=id)
+        except Exception as exception:
+            raise(exception)
+
+        # somente poderá modificar o objeto se for o autor do mesmo
+        if not news.author.id == user.id:
+            raise Exception("You don't have permission to do this.")
+
+        # atualiza o objeto
+        if title:
+            news.title = title
+        if body:
+            news.body = body
+        news.save()
+
+        return UpdateNews(news)
 
 
 ##########################################################################
 # MUTATION - Delete
 ##########################################################################
+class DeleteNews(graphene.relay.ClientIDMutation):
+    '''
+    Remove uma Notícia.
+    '''
+    news = graphene.Field(
+        NewsType,
+        description='Deleted News.'
+    )
+
+    class Input:
+        id = graphene.ID(description='ID da notícia', required=True)
+
+    @access_required
+    def mutate_and_get_payload(self, info, **_input):
+        _, id = from_global_id(_input.get('id'))
+        # identifica o usuario
+        user = info.context.user
+
+        # recupera o objeto do banco de dados
+        try:
+            news = News.objects.get(id=id)
+        except Exception as exception:
+            raise(exception)
+
+        # somente poderá modificar o objeto se for o autor do mesmo
+        if not news.author.id == user.id:
+            raise Exception("You don't have permission to do this.")
+
+        deleted_data = news
+        news.delete()
+        return DeleteNews(deleted_data)
 
 
 ##########################################################################
 # Schema Mutation
 ##########################################################################
 class Mutation:
+    # Create
     create_portal = CreatePortal.Field()
     create_topic = CreateTopic.Field()
     create_article = CreateArticle.Field()
     create_question = CreateQuestion.Field()
     create_tag = CreateTag.Field()
     create_rule = CreateRule.Field()
+    ceate_news = CreateNews.Field()
+
+    # Update
+    update_news = UpdateNews.Field()
+
+    # Delete
+    delete_news = DeleteNews.Field()
