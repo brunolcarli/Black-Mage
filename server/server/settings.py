@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     # 'chatbot',
     'black_list',
     'civil_cultural',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -52,8 +53,19 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'graphql_jwt.middleware.JSONWebTokenMiddleware',
+    # 'server.CorsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.BrokenLinkEmailsMiddleware',
+    'django.middleware.common.CommonMiddleware',
 ]
 
+CORS_ORIGIN_ALLOW_ALL = True
+
+CORS_ORIGIN_WHITELIST = [
+'http://localhost:3000',
+'http://localhost:8000',
+'http://localhost:8080',
+]
 ROOT_URLCONF = 'server.urls'
 
 TEMPLATES = [
