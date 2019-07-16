@@ -30,6 +30,7 @@ class PortalType(graphene.ObjectType):
     # TODO - add Chat
     # TODO - add Users
     # TODO - add Tags
+    # TODO - add Owner(s)
 
     def resolve_topics(self, info, **kwargs):
         return self.topic_set.all()
@@ -809,6 +810,38 @@ class UpdateNews(graphene.relay.ClientIDMutation):
 
         return UpdateNews(news)
 
+class UpdatePortal(graphene.relay.ClientIDMutation):
+    '''
+        Updates a Portal.
+    '''
+    portal = graphene.Field(
+        PortalType,
+        description='Updated Portal data response.'
+    )
+
+    class Input:
+        id = graphene.ID(
+            required=True,
+            description='Portal ID.'
+        )
+        name = graphene.String(
+            requried=True
+        )
+
+    def mutate_and_get_payload(self, info, **_input):
+        portal_id = _input.get('id')
+        name = _input.get('name')
+
+        _, portal_id = from_global_id(portal_id)
+        try:
+            portal = Portal.objects.get(id=portal_id)
+        except Portal.DoesNotExist:
+            raise Exception('Given Portal ID does not exist!')
+        else:
+            portal.name = name
+            portal.save()
+        return UpdatePortal(portal)
+
 
 ##########################################################################
 # MUTATION - Delete
@@ -862,6 +895,7 @@ class Mutation:
 
     # Update
     update_news = UpdateNews.Field()
+    update_portal = UpdatePortal.Field()
 
     # Delete
     delete_news = DeleteNews.Field()
