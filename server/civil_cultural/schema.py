@@ -810,6 +810,7 @@ class UpdateNews(graphene.relay.ClientIDMutation):
 
         return UpdateNews(news)
 
+
 class UpdatePortal(graphene.relay.ClientIDMutation):
     '''
         Updates a Portal.
@@ -879,6 +880,35 @@ class DeleteNews(graphene.relay.ClientIDMutation):
         return DeleteNews(deleted_data)
 
 
+class DeletePortal(graphene.relay.ClientIDMutation):
+    '''
+        Deletes a Portal.
+    '''
+    portal = graphene.Field(
+        PortalType,
+        description='Deleted Portal data response.'
+    )
+
+    class Input:
+        id = graphene.ID(
+            required=True,
+            description='Portal ID.'
+        )
+
+    def mutate_and_get_payload(self, info, **_input):
+        portal_id = _input.get('id')
+        _, portal_id = from_global_id(portal_id)
+
+        try:
+            portal = Portal.objects.get(id=portal_id)
+        except Portal.DoesNotExist:
+            raise Exception('Given Portal ID does not exist!')
+        else:
+            portal.delete()
+
+        return DeletePortal(portal)
+
+
 ##########################################################################
 # Schema Mutation
 ##########################################################################
@@ -899,3 +929,4 @@ class Mutation:
 
     # Delete
     delete_news = DeleteNews.Field()
+    delete_portal = DeletePortal.Field()
