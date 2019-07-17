@@ -956,6 +956,35 @@ class DeletePortal(graphene.relay.ClientIDMutation):
         return DeletePortal(portal)
 
 
+class DeleteTopic(graphene.ClientIDMutation):
+    '''
+        Deletes a Topic.
+    '''
+    topic = graphene.Field(
+        TopicType,
+        description='Deleted Topic data response.'
+    )
+
+    class Input:
+        id = graphene.ID(
+            required=True,
+            description='Topic ID.'
+        )
+
+    def mutate_and_get_payload(self, info, **_input):
+        _id = _input.get('id')
+        _, topic_id = from_global_id(_id)
+
+        try:
+            topic = Topic.objects.get(id=topic_id)
+        except Topic.DoesNotExist:
+            raise Exception('Given Topic does not exist.')
+
+        else:
+            topic.delete()
+            return DeleteTopic(topic)
+
+
 ##########################################################################
 # Schema Mutation
 ##########################################################################
@@ -978,3 +1007,4 @@ class Mutation:
     # Delete
     delete_news = DeleteNews.Field()
     delete_portal = DeletePortal.Field()
+    delete_topic = DeleteTopic.Field()
