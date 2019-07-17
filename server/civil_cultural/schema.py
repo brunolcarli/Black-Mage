@@ -1095,6 +1095,32 @@ class DeleteRule(graphene.ClientIDMutation):
             return DeleteRule(rule)
 
 
+class DeleteArticle(graphene.ClientIDMutation):
+    '''
+        Deletes a published article.
+    '''
+    article = graphene.Field(
+        ArticleType,
+        description='Deleted article data.'
+    )
+
+    class Input:
+        id = graphene.ID(
+            required=True
+        )
+
+    def mutate_and_get_payload(self, info, **_input):
+        _id = _input.get('id')
+        _, article_id = from_global_id(_id)
+
+        try:
+            article = Article.objects.get(id=article_id)
+        except Article.DoesNotExist:
+            raise Exception('Given article does not exist.')
+        else:
+            article.delete()
+            return DeleteArticle(article)
+
 ##########################################################################
 # Schema Mutation
 ##########################################################################
@@ -1121,3 +1147,4 @@ class Mutation:
     delete_portal = DeletePortal.Field()
     delete_topic = DeleteTopic.Field()
     delete_rule = DeleteRule.Field()
+    delete_article = DeleteArticle.Field()
