@@ -923,6 +923,57 @@ class UpdateRule(graphene.ClientIDMutation):
             return UpdateRule(rule)
 
 
+class UpdateArticle(graphene.ClientIDMutation):
+    '''
+        Updates a published article.
+    '''
+    article = graphene.Field(
+        ArticleType,
+        description='Updated article data.'
+    )
+
+    class Input:
+        id = graphene.ID(
+            required=True
+        )
+        title = graphene.String()
+        article_authors = graphene.List(
+            graphene.String
+        )
+        abstract = graphene.String()
+        body = graphene.String()
+        references = graphene.String()
+
+    def mutate_and_get_payload(self, info, **_input):
+        title = _input.get('title')
+        abstract = _input.get('abstract')
+        body = _input.get('body')
+        references = _input.get('references')
+        article_authors = _input.get('article_authors')
+        _id = _input.get('id')
+        _, article_id = from_global_id(_id)
+
+        try:
+            article = Article.objects.get(id=article_id)
+        except Article.DoesNotExist:
+            raise Exception('Given article does not exist.')
+        else:
+
+            if title:
+                article.title = title
+            if abstract:
+                article.abstract = abstract
+            if body:
+                article.body = body
+            if references:
+                article.refereces = references
+            if article_authors:
+                authors = ';'.join(author for author in article_authors)
+                article.article_authors = authors
+            article.save()
+            return UpdateArticle(article)
+
+
 ##########################################################################
 # MUTATION - Delete
 ##########################################################################
@@ -1063,6 +1114,7 @@ class Mutation:
     update_portal = UpdatePortal.Field()
     update_topic = UpdateTopic.Field()
     update_rule = UpdateRule.Field()
+    update_article = UpdateArticle.Field()
 
     # Delete
     delete_news = DeleteNews.Field()
