@@ -1008,6 +1008,37 @@ class UpdateQuestion(graphene.ClientIDMutation):
             return UpdateQuestion(question)
 
 
+class UpdateTag(graphene.ClientIDMutation):
+    '''
+        Updates a Tag.
+    '''
+    tag = graphene.Field(
+        TagType
+    )
+
+    class Input:
+        id = graphene.ID(
+            required=True
+        )
+        reference = graphene.String(
+            required=True
+        )
+
+    def mutate_and_get_payload(self, info, **_input):
+        reference = _input.get('reference')
+        _id = _input.get('id')
+        _, tag_id = from_global_id(_id)
+
+        try:
+            tag = Tag.objects.get(id=tag_id)
+        except Tag.DoesNotExist:
+            raise Exception('Sorry, the given tag does not exist.')
+        else:
+            tag.reference = reference
+            tag.save()
+            return UpdateTag(tag)
+
+
 ##########################################################################
 # MUTATION - Delete
 ##########################################################################
@@ -1205,6 +1236,7 @@ class Mutation:
     update_rule = UpdateRule.Field()
     update_article = UpdateArticle.Field()
     update_question = UpdateQuestion.Field()
+    update_tag = UpdateTag.Field()
 
     # Delete
     delete_news = DeleteNews.Field()
