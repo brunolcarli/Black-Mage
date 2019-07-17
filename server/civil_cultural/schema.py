@@ -891,6 +891,38 @@ class UpdateTopic(graphene.ClientIDMutation):
             return UpdateTopic(topic)
 
 
+class UpdateRule(graphene.ClientIDMutation):
+    '''
+        Updates a portal Rule.
+    '''
+    rule = graphene.Field(
+        RuleType,
+        description='Updated rule.'
+    )
+
+    class Input:
+        id = graphene.ID(
+            required=True
+        )
+        description = graphene.String(
+            required=True
+        )
+
+    def mutate_and_get_payload(self, info, **_input):
+        description = _input.get('description')
+        _id = _input.get('id')
+        _, rule_id = from_global_id(_id)
+
+        try:
+            rule = Rule.objects.get(id=rule_id)
+        except Rule.DoesNotExist:
+            raise Exception('Given Rule does not exist.')
+        else:
+            rule.description = description
+            rule.save()
+            return UpdateRule(rule)
+
+
 ##########################################################################
 # MUTATION - Delete
 ##########################################################################
@@ -1003,6 +1035,7 @@ class Mutation:
     update_news = UpdateNews.Field()
     update_portal = UpdatePortal.Field()
     update_topic = UpdateTopic.Field()
+    update_rule = UpdateRule.Field()
 
     # Delete
     delete_news = DeleteNews.Field()
