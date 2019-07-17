@@ -1155,6 +1155,35 @@ class DeleteArticle(graphene.ClientIDMutation):
             article.delete()
             return DeleteArticle(article)
 
+
+class DeleteQuestion(graphene.ClientIDMutation):
+    '''
+        Deletes a question.
+    '''
+    question = graphene.Field(
+        QuestionType
+    )
+
+    class Input:
+        id = graphene.ID(
+            required=True,
+            description='Question ID.'
+        )
+
+    def mutate_and_get_payload(self, info, **_input):
+        _id = _input.get('id')
+        _, question_id = from_global_id(_id)
+
+        try:
+            question = Question.objects.get(id=question_id)
+        except Question.DoesNotExist:
+            raise Exception('Sorry, the given question does not exist!')
+
+        else:
+            question.delete()
+            return DeleteQuestion(question)
+
+
 ##########################################################################
 # Schema Mutation
 ##########################################################################
@@ -1183,3 +1212,4 @@ class Mutation:
     delete_topic = DeleteTopic.Field()
     delete_rule = DeleteRule.Field()
     delete_article = DeleteArticle.Field()
+    delete_question = DeleteQuestion.Field()
