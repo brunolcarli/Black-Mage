@@ -844,6 +844,53 @@ class UpdatePortal(graphene.relay.ClientIDMutation):
         return UpdatePortal(portal)
 
 
+class UpdateTopic(graphene.ClientIDMutation):
+    '''
+        Updates a Topic.
+    '''
+    topic = graphene.Field(
+        TopicType,
+        description='Updated Topic data response.'
+    )
+
+    class Input:
+        id = graphene.ID(
+            required=True,
+            description='Topic ID.'
+        )
+        name = graphene.String(
+            description='Changes the Topic name.'
+        )
+        description = graphene.String(
+            description='Changes the Topic description.'
+        )
+        scope = graphene.String(
+            description='Changes the Topic scope.'
+        )
+
+    def mutate_and_get_payload(self, info, **_input):
+        name = _input.get('name')
+        description = _input.get('description')
+        scope = _input.get('scope')
+        _id = _input.get('id')
+        _, topic_id = from_global_id(_id)
+
+        try:
+            topic = Topic.objects.get(id=topic_id)
+        except Topic.DoesNotExist:
+            raise Exception('Given Topic does not exist.')
+
+        else:
+            if name:
+                topic.name = name
+            if description:
+                topic.description = description
+            if scope:
+                topic.scope = scope
+            topic.save()
+            return UpdateTopic(topic)
+
+
 ##########################################################################
 # MUTATION - Delete
 ##########################################################################
@@ -926,6 +973,7 @@ class Mutation:
     # Update
     update_news = UpdateNews.Field()
     update_portal = UpdatePortal.Field()
+    update_topic = UpdateTopic.Field()
 
     # Delete
     delete_news = DeleteNews.Field()
