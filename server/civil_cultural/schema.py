@@ -1215,6 +1215,32 @@ class DeleteQuestion(graphene.ClientIDMutation):
             return DeleteQuestion(question)
 
 
+class DeleteTag(graphene.ClientIDMutation):
+    '''
+        Deletes a Tag.
+    '''
+    tag = graphene.Field(
+        TagType
+    )
+
+    class Input:
+        id = graphene.ID(
+            required=True
+        )
+
+    def mutate_and_get_payload(self, info, **_input):
+        _id = _input.get('id')
+        _, tag_id = from_global_id(_id)
+
+        try:
+            tag = Tag.objects.get(id=tag_id)
+        except Tag.DoesNotExist:
+            raise Exception('Sorry, the given tag does not exist.')
+        else:
+            tag.delete()
+            return DeleteTag(tag)
+
+
 ##########################################################################
 # Schema Mutation
 ##########################################################################
@@ -1245,3 +1271,4 @@ class Mutation:
     delete_rule = DeleteRule.Field()
     delete_article = DeleteArticle.Field()
     delete_question = DeleteQuestion.Field()
+    delete_tag = DeleteTag.Field()
