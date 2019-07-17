@@ -1017,6 +1017,33 @@ class DeleteTopic(graphene.ClientIDMutation):
             return DeleteTopic(topic)
 
 
+class DeleteRule(graphene.ClientIDMutation):
+    '''
+        Deletes a portal Rule.
+    '''
+    rule = graphene.Field(
+        RuleType,
+        description='Deleted rule.'
+    )
+
+    class Input:
+        id = graphene.ID(
+            required=True
+        )
+
+    def mutate_and_get_payload(self, info, **_input):
+        _id = _input.get('id')
+        _, rule_id = from_global_id(_id)
+
+        try:
+            rule = Rule.objects.get(id=rule_id)
+        except Rule.DoesNotExist:
+            raise Exception('Given Rule does not exist.')
+        else:
+            rule.delete()
+            return DeleteRule(rule)
+
+
 ##########################################################################
 # Schema Mutation
 ##########################################################################
@@ -1041,3 +1068,4 @@ class Mutation:
     delete_news = DeleteNews.Field()
     delete_portal = DeletePortal.Field()
     delete_topic = DeleteTopic.Field()
+    delete_rule = DeleteRule.Field()
