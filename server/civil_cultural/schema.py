@@ -974,6 +974,40 @@ class UpdateArticle(graphene.ClientIDMutation):
             return UpdateArticle(article)
 
 
+class UpdateQuestion(graphene.ClientIDMutation):
+    '''
+        Updates a question.
+    '''
+    question = graphene.Field(
+        QuestionType
+    )
+
+    class Input:
+        id = graphene.ID(
+            required=True,
+            description='Question ID.'
+        )
+        text = graphene.String(
+            required=True,
+            description='Text to update'
+        )
+
+    def mutate_and_get_payload(self, info, **_input):
+        text = _input.get('text')
+        _id = _input.get('id')
+        _, question_id = from_global_id(_id)
+
+        try:
+            question = Question.objects.get(id=question_id)
+        except Question.DoesNotExist:
+            raise Exception('Sorry, the given question does not exist!')
+
+        else:
+            question.text = text
+            question.save()
+            return UpdateQuestion(question)
+
+
 ##########################################################################
 # MUTATION - Delete
 ##########################################################################
@@ -1141,6 +1175,7 @@ class Mutation:
     update_topic = UpdateTopic.Field()
     update_rule = UpdateRule.Field()
     update_article = UpdateArticle.Field()
+    update_question = UpdateQuestion.Field()
 
     # Delete
     delete_news = DeleteNews.Field()
