@@ -3,7 +3,7 @@ import graphene
 # models
 from users.schema import UserType
 from civil_cultural.models import (Portal, Topic, Article, Question, Tag, Rule,
-                                    SimilarSuggestion, News)
+                                    SimilarSuggestion, News, Answer)
 
 # resolvers
 
@@ -218,6 +218,7 @@ class NewsType(graphene.ObjectType):
     similar_suggestions = graphene.ConnectionField(
         'civil_cultural.schema.SimilarSuggestionConnection'
     )
+    # TODO question
 
     def resolve_portal(self, info, **Kwargs):
         return self.portal_reference
@@ -246,7 +247,7 @@ class SimilarSuggestionType(graphene.ObjectType):
         UserType
     )
     description = graphene.String()
-    link = graphene.String(required=True)
+    link = graphene.String()
     pro_votes = graphene.Int()
     cons_votes = graphene.Int()
     publish_datetime = graphene.DateTime()
@@ -255,6 +256,31 @@ class SimilarSuggestionType(graphene.ObjectType):
 class SimilarSuggestionConnection(graphene.relay.Connection):
     class Meta:
         node = SimilarSuggestionType
+
+
+class AnswerType(graphene.ObjectType):
+    '''
+        Defines an Answer post GraphQl object.
+    '''
+    class Meta:
+        interfaces = (graphene.relay.Node,)
+
+    post_author = graphene.Field(
+        UserType
+    )
+    question = graphene.Field(QuestionType)
+    text = graphene.String()
+    pro_votes = graphene.Int()
+    cons_votes = graphene.Int()
+    publish_datetime = graphene.DateTime()
+
+    def resolve_question(self, info, **kwargs):
+        return self.question
+
+
+class AnswerConnection(graphene.relay.Connection):
+    class Meta:
+        node = AnswerType
 
 
 ##########################################################################
@@ -375,6 +401,14 @@ class Query(object):
                         n for n in news if body_contains.lower() in n.body.lower()
                     ]
         return news
+
+    answers = graphene.relay.ConnectionField(
+        AnswerConnection
+    )
+
+    @access_required
+    def resolve_answers(self, info, **kwargs):
+        return Answer.objects.all()
 
 
 ##########################################################################

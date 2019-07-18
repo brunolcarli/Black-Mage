@@ -197,3 +197,25 @@ class News(models.Model):
         on_delete=models.PROTECT
         )
     portal_reference = models.ForeignKey(Portal, on_delete=models.CASCADE)
+    # TODO question
+
+
+class Answer(models.Model):
+    question = models.ForeignKey(
+        Question,
+        on_delete=models.CASCADE
+    )
+    text = models.TextField(
+        null=True,
+        blank=True    
+    )
+    author = models.ForeignKey(
+        get_user_model(),
+        on_delete=models.PROTECT
+    )
+    pro_votes = models.IntegerField(default=0)
+    cons_votes = models.IntegerField(default=0)
+    publish_datetime = models.DateTimeField(
+        auto_now_add=True
+    )
+    post_key = models.CharField(max_length=50)
