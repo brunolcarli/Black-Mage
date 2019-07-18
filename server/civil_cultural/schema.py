@@ -1276,6 +1276,33 @@ class DeleteTag(graphene.ClientIDMutation):
             return DeleteTag(tag)
 
 
+class DeleteSuggestion(graphene.ClientIDMutation):
+    '''
+        Deletes a Similar Suggestion
+    '''
+    similar_suggestion = graphene.Field(
+        SimilarSuggestionType
+    )
+
+    class Input:
+        id = graphene.ID(
+            required=True
+        )
+
+    def mutate_and_get_payload(self, info, **_input):
+        _id = _input.get('id')
+        _, suggestion_id = from_global_id(_id)
+
+        try:
+            suggestion = SimilarSuggestion.objects.get(id=suggestion_id)
+        except SimilarSuggestion.DoesNotExist:
+            raise Exception('Given Suggestion does not exist.')
+
+        else:
+            suggestion.delete()
+            return DeleteSuggestion(suggestion)
+
+
 ##########################################################################
 # Schema Mutation
 ##########################################################################
@@ -1308,3 +1335,4 @@ class Mutation:
     delete_article = DeleteArticle.Field()
     delete_question = DeleteQuestion.Field()
     delete_tag = DeleteTag.Field()
+    delete_similar_suggestion = DeleteSuggestion.Field()
