@@ -1039,6 +1039,41 @@ class UpdateTag(graphene.ClientIDMutation):
             return UpdateTag(tag)
 
 
+class UpdateSuggestion(graphene.ClientIDMutation):
+    '''
+        Updates a Similar Suggestion
+    '''
+    similar_suggestion = graphene.Field(
+        SimilarSuggestionType
+    )
+
+    class Input:
+        id = graphene.ID(
+            required=True
+        )
+        description = graphene.String()
+        link = graphene.String()
+
+    def mutate_and_get_payload(self, info, **_input):
+        description = _input.get('description')
+        link = _input.get('link')
+        _id = _input.get('id')
+        _, suggestion_id = from_global_id(_id)
+
+        try:
+            suggestion = SimilarSuggestion.objects.get(id=suggestion_id)
+        except SimilarSuggestion.DoesNotExist:
+            raise Exception('Given Suggestion does not exist.')
+
+        else:
+            if description:
+                suggestion.description = description
+            if link:
+                suggestion.link = link
+            suggestion.save()
+            return UpdateSuggestion(suggestion)
+
+
 ##########################################################################
 # MUTATION - Delete
 ##########################################################################
@@ -1263,6 +1298,7 @@ class Mutation:
     update_article = UpdateArticle.Field()
     update_question = UpdateQuestion.Field()
     update_tag = UpdateTag.Field()
+    update_similar_suggestion = UpdateSuggestion.Field()
 
     # Delete
     delete_news = DeleteNews.Field()
