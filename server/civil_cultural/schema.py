@@ -140,9 +140,15 @@ class QuestionType(graphene.ObjectType):
     cons_votes = graphene.Int()
     publish_datetime = graphene.DateTime()
     article = graphene.Field('civil_cultural.schema.ArticleType')
+    answers = graphene.relay.ConnectionField(
+        'civil_cultural.schema.AnswerConnection'
+    )
 
     def resolve_article(self, info, **kwargs):
         return self.published_article
+
+    def resolve_answers(self, info, **kwargs):
+        return self.answer_set.all()
 
 
 class QuestionConnection(graphene.relay.Connection):
@@ -268,14 +274,19 @@ class AnswerType(graphene.ObjectType):
     post_author = graphene.Field(
         UserType
     )
-    question = graphene.Field(QuestionType)
     text = graphene.String()
     pro_votes = graphene.Int()
     cons_votes = graphene.Int()
     publish_datetime = graphene.DateTime()
+    question = graphene.Field(
+        QuestionType
+    )
 
     def resolve_question(self, info, **kwargs):
         return self.question
+
+    def resolve_post_author(self, info, **kwargs):
+        return self.author
 
 
 class AnswerConnection(graphene.relay.Connection):
@@ -296,7 +307,7 @@ class Query(object):
         PortalConnection
     )
 
-    # @access_required
+    @access_required
     def resolve_portals(self, info, **kwargs):
         '''
             Returns all portals from civil cultural.
@@ -307,7 +318,7 @@ class Query(object):
         TopicConnection
     )
 
-    # @access_required
+    @access_required
     def resolve_topics(self, info, **kwargs):
         '''
             Returns all topics from civil cultural.
@@ -318,7 +329,7 @@ class Query(object):
         ArticleConnection
     )
 
-    # @access_required
+    @access_required
     def resolve_articles(self, info, **kwargs):
         return Article.objects.all()
 
@@ -326,19 +337,19 @@ class Query(object):
         QuestionConnection
     )
 
-    # @access_required
+    @access_required
     def resolve_questions(self, info, **kwargs):
         return Question.objects.all()
 
     tags = graphene.relay.ConnectionField(TagConnection) 
 
-    # @access_required
+    @access_required
     def resolve_tags(self, info, **kwargs):
         return Tag.objects.all()
 
     rules = graphene.relay.ConnectionField(RuleConnection)
 
-    # @access_required
+    @access_required
     def resolve_rules(self, info, **kwargs):
         return Rule.objects.all()
 
@@ -346,7 +357,7 @@ class Query(object):
         SimilarSuggestionConnection
     )
 
-    # @access_required
+    @access_required
     def resolve_similar_suggestions(self, info, **kwargs):
         return SimilarSuggestion.objects.all()
 
@@ -426,7 +437,7 @@ class CreatePortal(graphene.relay.ClientIDMutation):
     class Input:
         name = graphene.String(description='Portal title.')
 
-    # @access_required
+    @access_required
     def mutate_and_get_payload(self, info, **_input):
         # captura dos inputs
         name = _input.get('name')
@@ -468,7 +479,7 @@ class CreateTopic(graphene.relay.ClientIDMutation):
             description='Topic portal ID.'
         )
 
-    # @access_required
+    @access_required
     def mutate_and_get_payload(self, info, **_input):
         # captura dos inputs
         name = _input.get('name')
@@ -796,6 +807,49 @@ class CreateSimilarSuggestion(graphene.relay.ClientIDMutation):
             return CreateSimilarSuggestion(similar_suggestion)
         except Exception as ex:
             raise ex
+
+
+class CreateAnswer(graphene.relay.ClientIDMutation):
+    '''
+        Creates a answer.
+    '''
+    answer = graphene.Field(
+        AnswerType
+    )
+
+    class Input:
+        text = graphene.String(requried=True)
+        question = graphene.ID(
+            required=True
+        )
+
+    def mutate_and_get_payload(self, info, **_input):
+        text = _input.get('text')
+        _id = _input.get('question')
+        _, question_id = from_global_id(_id)
+
+        # identifica o usuario
+        user = info.context.user
+
+        try:
+            question = Question.objects.get(
+                id=question_id
+            )
+        except Question.DoesNotExist:
+            raise Exception('Given question does not exists.')
+
+        try:
+            answer = Answer.objects.create(
+                text=text,
+                author=user,
+                question=question
+            )
+            answer.save()
+
+            return CreateAnswer(answer)
+
+        except Exception as exception:
+            raise(exception)
 
 
 ##########################################################################
@@ -1350,6 +1404,7 @@ class Mutation:
     create_rule = CreateRule.Field()
     ceate_news = CreateNews.Field()
     create_similar_suggestion = CreateSimilarSuggestion.Field()
+    create_answer = CreateAnswer.Field()
 
     # Update
     update_news = UpdateNews.Field()

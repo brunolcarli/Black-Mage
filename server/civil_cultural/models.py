@@ -218,4 +218,3 @@ class Answer(models.Model):
     publish_datetime = models.DateTimeField(
         auto_now_add=True
     )
-    post_key = models.CharField(max_length=50)
