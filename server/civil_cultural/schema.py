@@ -1,24 +1,33 @@
-import graphene
+"""
+Schema da aplicaçnao civil-cultural.
+Este módulo contém:
+    - Modelos de objetos graphql;
+    - Queries (consultas);
+    - Mutations:
+        + Creates;
+        + Updates;
+        + Deletes;
 
-# models
+By: BeelzeBruno <brunolcarli@gmail.com>
+"""
+import graphene
+from graphql_relay import from_global_id
+
 from users.schema import UserType
 from civil_cultural.models import (Portal, Topic, Article, Question, Tag, Rule,
                                     SimilarSuggestion, News, Answer)
 
-# resolvers
-
-# other stuff
 from users.utils import access_required
-from graphql_relay import from_global_id
+
 
 
 ##########################################################################
 # GraphQl Objects
 ##########################################################################
 class PortalType(graphene.ObjectType):
-    '''
-        Defines a GraphQl Portal object.
-    '''
+    """
+    Defines a GraphQl Portal object.
+    """
     class Meta:
         interfaces = (graphene.relay.Node,)
 
@@ -48,9 +57,9 @@ class PortalConnection(graphene.relay.Connection):
 
 
 class TopicType(graphene.ObjectType):
-    '''
-        Defines a GraphQl Topic object.
-    '''
+    """
+    Defines a GraphQl Topic object.
+    """
     class Meta:
         interfaces = (graphene.relay.Node,)
 
@@ -79,9 +88,9 @@ class TopicConnection(graphene.relay.Connection):
 
 
 class ArticleType(graphene.ObjectType):
-    '''
-        Defines an Article GraphQl object.
-    '''
+    """
+    Defines an Article GraphQl object.
+    """
     class Meta:
         interfaces = (graphene.relay.Node,)
 
@@ -124,10 +133,10 @@ class ArticleConnection(graphene.relay.Connection):
 
 
 class QuestionType(graphene.ObjectType):
-    '''
-        Defines an Question GraphQl object.
-        A question is related to a specific Article
-    '''
+    """
+    Defines an Question GraphQl object.
+    A question is related to a specific Article
+    """
     class Meta:
         interfaces = (graphene.relay.Node,)
 
@@ -157,11 +166,11 @@ class QuestionConnection(graphene.relay.Connection):
 
 
 class TagType(graphene.ObjectType):
-    '''
-        Defines an Tag GraphQl object.
-        A tag is related to a specific subject matter.
-        Can be used to filter and group objects.
-    '''
+    """
+    Defines an Tag GraphQl object.
+    A tag is related to a specific subject matter.
+    Can be used to filter and group objects.
+    """
     class Meta:
         interfaces = (graphene.relay.Node,)
 
@@ -174,9 +183,9 @@ class TagConnection(graphene.relay.Connection):
 
 
 class RuleType(graphene.ObjectType):
-    '''
-        Defines an Rule GraphQl object.
-    '''
+    """
+    Defines an Rule GraphQl object.
+    """
     class Meta:
         interfaces = (graphene.relay.Node,)
 
@@ -194,7 +203,9 @@ class RuleConnection(graphene.relay.Connection):
 
 
 class NewsType(graphene.ObjectType):
-    '''Representação de uma Noticia'''
+    """
+    Representação de uma Noticia
+    """
     class Meta:
         interfaces = (graphene.relay.Node,)
 
@@ -243,9 +254,9 @@ class NewsConnection(graphene.relay.Connection):
 
 
 class SimilarSuggestionType(graphene.ObjectType):
-    '''
-        Defines an Similar Suggestion GraphQl object.
-    '''
+    """
+    Defines an Similar Suggestion GraphQl object.
+    """
     class Meta:
         interfaces = (graphene.relay.Node,)
 
@@ -265,9 +276,9 @@ class SimilarSuggestionConnection(graphene.relay.Connection):
 
 
 class AnswerType(graphene.ObjectType):
-    '''
-        Defines an Answer post GraphQl object.
-    '''
+    """
+    Defines an Answer post GraphQl object.
+    """
     class Meta:
         interfaces = (graphene.relay.Node,)
 
@@ -298,9 +309,9 @@ class AnswerConnection(graphene.relay.Connection):
 # Schema QUERY
 ##########################################################################
 class Query(object):
-    '''
-        Queries for civil_cultural.
-    '''
+    """
+    Queries for civil_cultural.
+    """
     node = graphene.relay.Node.Field()
 
     portals = graphene.relay.ConnectionField(
@@ -309,9 +320,9 @@ class Query(object):
 
     @access_required
     def resolve_portals(self, info, **kwargs):
-        '''
-            Returns all portals from civil cultural.
-        '''
+        """
+        Returns all portals from civil cultural.
+        """
         return Portal.objects.all()
 
     topics = graphene.relay.ConnectionField(
@@ -320,9 +331,9 @@ class Query(object):
 
     @access_required
     def resolve_topics(self, info, **kwargs):
-        '''
-            Returns all topics from civil cultural.
-        '''
+        """
+        Returns all topics from civil cultural.
+        """
         return Topic.objects.all()
 
     articles = graphene.relay.ConnectionField(
@@ -376,10 +387,10 @@ class Query(object):
 
     @access_required
     def resolve_news(self, info, **kwargs):
-        '''
-        retorna uma lista de noticias registradas
+        """
+        Retorna uma lista de noticias registradas
         no sistema.
-        '''
+        """
         # filtros
         author = kwargs.get('author')
         title_contains = kwargs.get('title_contains')
@@ -426,9 +437,9 @@ class Query(object):
 # MUTATION - Create
 ##########################################################################
 class CreatePortal(graphene.relay.ClientIDMutation):
-    '''
-        Creates a portal
-    '''
+    """
+    Creates a portal
+    """
     portal = graphene.Field(
         PortalType,
         description='Created portal data response.'
@@ -455,9 +466,9 @@ class CreatePortal(graphene.relay.ClientIDMutation):
 
 
 class CreateTopic(graphene.relay.ClientIDMutation):
-    '''
-        Creates a topic
-    '''
+    """
+    Craates a topic
+    """
     topic = graphene.Field(
         TopicType,
         description='Created topic data response.'
@@ -511,9 +522,9 @@ class CreateTopic(graphene.relay.ClientIDMutation):
 
 
 class CreateArticle(graphene.relay.ClientIDMutation):
-    '''
-        Creates an Article
-    '''
+    """
+    Creates an Article
+    """
     article = graphene.Field(
         ArticleType,
         description='Created article data response.'
@@ -581,9 +592,9 @@ class CreateArticle(graphene.relay.ClientIDMutation):
 
 
 class CreateQuestion(graphene.relay.ClientIDMutation):
-    '''
-        Creates an Question on an Article
-    '''
+    """
+    Creates an Question on an Article
+    """
     question = graphene.Field(
         QuestionType,
         description='Created article data response.'
@@ -630,9 +641,9 @@ class CreateQuestion(graphene.relay.ClientIDMutation):
 
 
 class CreateTag(graphene.relay.ClientIDMutation):
-    '''
-        Creates a Tag
-    '''
+    """
+    Creates a Tag
+    """
     tag = graphene.Field(
         TagType,
         description='Created Tag data.'
@@ -663,9 +674,9 @@ class CreateTag(graphene.relay.ClientIDMutation):
 
 
 class CreateRule(graphene.relay.ClientIDMutation):
-    '''
-        Creates a Rule
-    '''
+    """
+    Creates a Rule
+    """
     rule = graphene.Field(RuleType)
 
     class Input:
@@ -703,9 +714,9 @@ class CreateRule(graphene.relay.ClientIDMutation):
 
 
 class CreateNews(graphene.relay.ClientIDMutation):
-    '''
+    """
     Cria uma Noticia
-    '''
+    """
     news = graphene.Field(
         NewsType,
         description='Created news data response.'
@@ -749,9 +760,9 @@ class CreateNews(graphene.relay.ClientIDMutation):
 
 
 class CreateSimilarSuggestion(graphene.relay.ClientIDMutation):
-    '''
-        Creates a similar suggestion post.
-    '''
+    """
+    Creates a similar suggestion post.
+    """
     similar_suggestion = graphene.Field(
         SimilarSuggestionType
     )
@@ -810,9 +821,9 @@ class CreateSimilarSuggestion(graphene.relay.ClientIDMutation):
 
 
 class CreateAnswer(graphene.relay.ClientIDMutation):
-    '''
-        Creates a answer.
-    '''
+    """
+    Creates a answer.
+    """
     answer = graphene.Field(
         AnswerType
     )
@@ -856,9 +867,9 @@ class CreateAnswer(graphene.relay.ClientIDMutation):
 # MUTATION - Update
 ##########################################################################
 class UpdateNews(graphene.relay.ClientIDMutation):
-    '''
-        Updates a published News.
-    '''
+    """
+    Updates a published News.
+    """
     news = graphene.Field(
         NewsType,
         description='Updated news data response.'
@@ -900,9 +911,9 @@ class UpdateNews(graphene.relay.ClientIDMutation):
 
 
 class UpdatePortal(graphene.relay.ClientIDMutation):
-    '''
-        Updates a Portal.
-    '''
+    """
+    Updates a Portal.
+    """
     portal = graphene.Field(
         PortalType,
         description='Updated Portal data response.'
@@ -933,9 +944,9 @@ class UpdatePortal(graphene.relay.ClientIDMutation):
 
 
 class UpdateTopic(graphene.ClientIDMutation):
-    '''
-        Updates a Topic.
-    '''
+    """
+    Updates a Topic.
+    """
     topic = graphene.Field(
         TopicType,
         description='Updated Topic data response.'
@@ -980,9 +991,9 @@ class UpdateTopic(graphene.ClientIDMutation):
 
 
 class UpdateRule(graphene.ClientIDMutation):
-    '''
-        Updates a portal Rule.
-    '''
+    """
+    Updates a portal Rule.
+    """
     rule = graphene.Field(
         RuleType,
         description='Updated rule.'
@@ -1012,9 +1023,9 @@ class UpdateRule(graphene.ClientIDMutation):
 
 
 class UpdateArticle(graphene.ClientIDMutation):
-    '''
-        Updates a published article.
-    '''
+    """
+    Updates a published article.
+    """
     article = graphene.Field(
         ArticleType,
         description='Updated article data.'
@@ -1063,9 +1074,9 @@ class UpdateArticle(graphene.ClientIDMutation):
 
 
 class UpdateQuestion(graphene.ClientIDMutation):
-    '''
-        Updates a question.
-    '''
+    """
+    Updates a question.
+    """
     question = graphene.Field(
         QuestionType
     )
@@ -1097,9 +1108,9 @@ class UpdateQuestion(graphene.ClientIDMutation):
 
 
 class UpdateTag(graphene.ClientIDMutation):
-    '''
-        Updates a Tag.
-    '''
+    """
+    Updates a Tag.
+    """
     tag = graphene.Field(
         TagType
     )
@@ -1128,9 +1139,9 @@ class UpdateTag(graphene.ClientIDMutation):
 
 
 class UpdateSuggestion(graphene.ClientIDMutation):
-    '''
-        Updates a Similar Suggestion
-    '''
+    """
+    Updates a Similar Suggestion
+    """
     similar_suggestion = graphene.Field(
         SimilarSuggestionType
     )
@@ -1166,9 +1177,9 @@ class UpdateSuggestion(graphene.ClientIDMutation):
 # MUTATION - Delete
 ##########################################################################
 class DeleteNews(graphene.relay.ClientIDMutation):
-    '''
+    """
     Remove uma Notícia.
-    '''
+    """
     news = graphene.Field(
         NewsType,
         description='Deleted News.'
@@ -1199,9 +1210,9 @@ class DeleteNews(graphene.relay.ClientIDMutation):
 
 
 class DeletePortal(graphene.relay.ClientIDMutation):
-    '''
-        Deletes a Portal.
-    '''
+    """
+    Deletes a Portal.
+    """
     portal = graphene.Field(
         PortalType,
         description='Deleted Portal data response.'
@@ -1228,9 +1239,9 @@ class DeletePortal(graphene.relay.ClientIDMutation):
 
 
 class DeleteTopic(graphene.ClientIDMutation):
-    '''
-        Deletes a Topic.
-    '''
+    """
+    Deletes a Topic.
+    """
     topic = graphene.Field(
         TopicType,
         description='Deleted Topic data response.'
@@ -1257,9 +1268,9 @@ class DeleteTopic(graphene.ClientIDMutation):
 
 
 class DeleteRule(graphene.ClientIDMutation):
-    '''
-        Deletes a portal Rule.
-    '''
+    """
+    Deletes a portal Rule.
+    """
     rule = graphene.Field(
         RuleType,
         description='Deleted rule.'
@@ -1284,9 +1295,9 @@ class DeleteRule(graphene.ClientIDMutation):
 
 
 class DeleteArticle(graphene.ClientIDMutation):
-    '''
-        Deletes a published article.
-    '''
+    """
+    Deletes a published article.
+    """
     article = graphene.Field(
         ArticleType,
         description='Deleted article data.'
@@ -1311,9 +1322,9 @@ class DeleteArticle(graphene.ClientIDMutation):
 
 
 class DeleteQuestion(graphene.ClientIDMutation):
-    '''
-        Deletes a question.
-    '''
+    """
+    Deletes a question.
+    """
     question = graphene.Field(
         QuestionType
     )
@@ -1339,9 +1350,9 @@ class DeleteQuestion(graphene.ClientIDMutation):
 
 
 class DeleteTag(graphene.ClientIDMutation):
-    '''
-        Deletes a Tag.
-    '''
+    """
+    Deletes a Tag.
+    """
     tag = graphene.Field(
         TagType
     )
@@ -1365,9 +1376,9 @@ class DeleteTag(graphene.ClientIDMutation):
 
 
 class DeleteSuggestion(graphene.ClientIDMutation):
-    '''
-        Deletes a Similar Suggestion
-    '''
+    """
+    Deletes a Similar Suggestion
+    """
     similar_suggestion = graphene.Field(
         SimilarSuggestionType
     )
