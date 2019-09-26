@@ -654,7 +654,7 @@ class CreateTag(graphene.relay.ClientIDMutation):
             required=True
         )
 
-    # @access_required
+    @access_required
     def mutate_and_get_payload(self, info, **_input):
         reference = _input.get('reference')
 
@@ -688,7 +688,7 @@ class CreateRule(graphene.relay.ClientIDMutation):
             required=True
         )
 
-    # @access_required
+    @access_required
     def mutate_and_get_payload(self, info, **_input):
         description = _input.get('description')
         portal_id = _input.get('portal')
@@ -834,6 +834,7 @@ class CreateAnswer(graphene.relay.ClientIDMutation):
             required=True
         )
 
+    @access_required
     def mutate_and_get_payload(self, info, **_input):
         text = _input.get('text')
         _id = _input.get('question')
@@ -928,6 +929,7 @@ class UpdatePortal(graphene.relay.ClientIDMutation):
             requried=True
         )
 
+    @access_required
     def mutate_and_get_payload(self, info, **_input):
         portal_id = _input.get('id')
         name = _input.get('name')
@@ -967,6 +969,7 @@ class UpdateTopic(graphene.ClientIDMutation):
             description='Changes the Topic scope.'
         )
 
+    @access_required
     def mutate_and_get_payload(self, info, **_input):
         name = _input.get('name')
         description = _input.get('description')
@@ -1007,6 +1010,7 @@ class UpdateRule(graphene.ClientIDMutation):
             required=True
         )
 
+    @access_required
     def mutate_and_get_payload(self, info, **_input):
         description = _input.get('description')
         _id = _input.get('id')
@@ -1043,6 +1047,7 @@ class UpdateArticle(graphene.ClientIDMutation):
         body = graphene.String()
         references = graphene.String()
 
+    @access_required
     def mutate_and_get_payload(self, info, **_input):
         title = _input.get('title')
         abstract = _input.get('abstract')
@@ -1091,6 +1096,7 @@ class UpdateQuestion(graphene.ClientIDMutation):
             description='Text to update'
         )
 
+    @access_required
     def mutate_and_get_payload(self, info, **_input):
         text = _input.get('text')
         _id = _input.get('id')
@@ -1123,6 +1129,7 @@ class UpdateTag(graphene.ClientIDMutation):
             required=True
         )
 
+    @access_required
     def mutate_and_get_payload(self, info, **_input):
         reference = _input.get('reference')
         _id = _input.get('id')
@@ -1153,6 +1160,7 @@ class UpdateSuggestion(graphene.ClientIDMutation):
         description = graphene.String()
         link = graphene.String()
 
+    @access_required
     def mutate_and_get_payload(self, info, **_input):
         description = _input.get('description')
         link = _input.get('link')
@@ -1224,6 +1232,7 @@ class DeletePortal(graphene.relay.ClientIDMutation):
             description='Portal ID.'
         )
 
+    @access_required
     def mutate_and_get_payload(self, info, **_input):
         portal_id = _input.get('id')
         _, portal_id = from_global_id(portal_id)
@@ -1253,6 +1262,7 @@ class DeleteTopic(graphene.ClientIDMutation):
             description='Topic ID.'
         )
 
+    @access_required
     def mutate_and_get_payload(self, info, **_input):
         _id = _input.get('id')
         _, topic_id = from_global_id(_id)
@@ -1281,6 +1291,7 @@ class DeleteRule(graphene.ClientIDMutation):
             required=True
         )
 
+    @access_required
     def mutate_and_get_payload(self, info, **_input):
         _id = _input.get('id')
         _, rule_id = from_global_id(_id)
@@ -1308,6 +1319,7 @@ class DeleteArticle(graphene.ClientIDMutation):
             required=True
         )
 
+    @access_required
     def mutate_and_get_payload(self, info, **_input):
         _id = _input.get('id')
         _, article_id = from_global_id(_id)
@@ -1335,6 +1347,7 @@ class DeleteQuestion(graphene.ClientIDMutation):
             description='Question ID.'
         )
 
+    @access_required
     def mutate_and_get_payload(self, info, **_input):
         _id = _input.get('id')
         _, question_id = from_global_id(_id)
@@ -1362,6 +1375,7 @@ class DeleteTag(graphene.ClientIDMutation):
             required=True
         )
 
+    @access_required
     def mutate_and_get_payload(self, info, **_input):
         _id = _input.get('id')
         _, tag_id = from_global_id(_id)
@@ -1388,6 +1402,7 @@ class DeleteSuggestion(graphene.ClientIDMutation):
             required=True
         )
 
+    @access_required
     def mutate_and_get_payload(self, info, **_input):
         _id = _input.get('id')
         _, suggestion_id = from_global_id(_id)
