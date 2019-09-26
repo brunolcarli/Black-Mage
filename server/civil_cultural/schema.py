@@ -1181,6 +1181,59 @@ class UpdateSuggestion(graphene.ClientIDMutation):
             return UpdateSuggestion(suggestion)
 
 
+class UpdateAnswer(graphene.relay.ClientIDMutation):
+    """
+    Updates a created answer.
+    """
+    answer = graphene.Field(
+        AnswerType
+    )
+
+    class Input:
+        id = graphene.ID(
+            required=True
+        )
+        text = graphene.String(
+            required=True
+        )
+
+    @access_required
+    def mutate_and_get_payload(self, info, **_input):
+        text = _input.get('text')
+        _id = _input.get('id')
+        object_type, answer_id = from_global_id(_id)
+
+        if not object_type == 'AnswerType':
+            raise Exception('Invalid ID: The given ID is not a Answer ID!')
+
+        if not text:
+            raise Exception('The text must not be blank! Write something.')
+
+        # Tenta recuperar o objeto do banco de dados
+        try:
+            answer = Answer.objects.get(
+                id=answer_id
+            )
+        except Answer.DoesNotExist:
+            raise Exception('Given answer does not exists.')
+
+        # identifica o usuario
+        user = info.context.user
+
+        # somente poderá modificar o objeto se for o autor do mesmo
+        if not answer.author.id == user.id:
+            raise Exception("You don't have permission to do this.")
+
+        try:
+            answer.text = text
+            answer.save()
+
+        except Exception as exception:
+            raise(exception)
+
+        return UpdateAnswer(answer)
+
+
 ##########################################################################
 # MUTATION - Delete
 ##########################################################################
@@ -1441,6 +1494,7 @@ class Mutation:
     update_question = UpdateQuestion.Field()
     update_tag = UpdateTag.Field()
     update_similar_suggestion = UpdateSuggestion.Field()
+    update_answer = UpdateAnswer.Field()
 
     # Delete
     delete_news = DeleteNews.Field()
