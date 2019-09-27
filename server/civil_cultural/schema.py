@@ -1549,7 +1549,39 @@ class JoinPortal(graphene.relay.ClientIDMutation):
 
         return JoinPortal(portal)
 
-        
+
+class LeavePortal(graphene.relay.ClientIDMutation):
+    """
+    Leaves a Portal membership.
+    """
+    portal = graphene.Field(PortalType)
+
+    class Input:
+        portal_id = graphene.ID(required=True)
+
+    @access_required
+    def mutate_and_get_payload(self, info, **_input):
+        _id = _input.get('portal_id')
+        object_type, portal_id = from_global_id(_id)
+
+        if not object_type == 'PortalType':
+            raise Exception('Invalid ID: The given ID is not a Portal ID!')
+
+        try:
+            portal = Portal.objects.get(id=portal_id)
+        except Portal.DoesNotExist:
+            raise Exception('Given Portal ID does not exist!')
+
+        # identifica o usuario
+        user = info.context.user
+        if user in portal.users.all():
+            portal.users.remove(user)
+        else:
+            raise Exception('Your not a member of this Portal!')
+
+        return LeavePortal(portal)
+
+
 ##########################################################################
 # Schema Mutation
 ##########################################################################
@@ -1589,3 +1621,4 @@ class Mutation:
 
     # Other stuff
     join_portal = JoinPortal.Field()
+    leave_portal = LeavePortal.Field()
