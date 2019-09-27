@@ -1470,6 +1470,47 @@ class DeleteSuggestion(graphene.ClientIDMutation):
             return DeleteSuggestion(suggestion)
 
 
+class DeleteAnswer(graphene.relay.ClientIDMutation):
+    """
+    Deletes a created answer.
+    """
+    answer = graphene.Field(
+        AnswerType
+    )
+
+    class Input:
+        id = graphene.ID(
+            required=True
+        )
+
+    @access_required
+    def mutate_and_get_payload(self, info, **_input):
+        _id = _input.get('id')
+        object_type, answer_id = from_global_id(_id)
+
+        if not object_type == 'AnswerType':
+            raise Exception('Invalid ID: The given ID is not a Answer ID!')
+
+        # Tenta recuperar o objeto do banco de dados
+        try:
+            answer = Answer.objects.get(
+                id=answer_id
+            )
+        except Answer.DoesNotExist:
+            raise Exception('Given answer does not exists.')
+
+        # identifica o usuario
+        user = info.context.user
+
+        # somente poderá modificar o objeto se for o autor do mesmo
+        if not answer.author.id == user.id:
+            raise Exception("You don't have permission to do this.")
+
+        answer.delete()
+
+        return DeleteAnswer(answer)
+
+
 ##########################################################################
 # Schema Mutation
 ##########################################################################
@@ -1505,3 +1546,4 @@ class Mutation:
     delete_question = DeleteQuestion.Field()
     delete_tag = DeleteTag.Field()
     delete_similar_suggestion = DeleteSuggestion.Field()
+    delete_answer = DeleteAnswer.Field()
