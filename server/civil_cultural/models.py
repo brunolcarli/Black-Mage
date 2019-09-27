@@ -13,11 +13,16 @@ class Portal(models.Model):
         auto_now_add=True
     )
     topics = models.ManyToManyField('civil_cultural.Topic')
-    
+    is_public = models.BooleanField(default=True)
     rules = models.ManyToManyField('civil_cultural.Rule')
     # TODO - add Chat
     users = models.ManyToManyField(get_user_model())
     tags = models.ManyToManyField('civil_cultural.Tag')
+    owner = models.ForeignKey(
+        get_user_model(),
+        on_delete=models.CASCADE,
+        related_name='portal_owner'
+    )
 
 
 class Topic(models.Model):
