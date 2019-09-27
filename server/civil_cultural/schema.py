@@ -36,7 +36,7 @@ class PortalType(graphene.ObjectType):
     topics = graphene.ConnectionField('civil_cultural.schema.TopicConnection')
     news = graphene.ConnectionField('civil_cultural.schema.NewsConnection')
     rules = graphene.ConnectionField('civil_cultural.schema.RuleConnection')
-    users = graphene.ConnectionField(UserConnection)
+    members = graphene.ConnectionField(UserConnection)
     # TODO - add Chat
     # TODO - add Tags
     # TODO - add Owner(s)
@@ -50,7 +50,7 @@ class PortalType(graphene.ObjectType):
     def resolve_news(self, info, **kwargs):
         return self.news_set.all()
 
-    def resolve_users(self, info, **kwargs):
+    def resolve_members(self, info, **kwargs):
         return self.users.all()
 
 
