@@ -13,7 +13,7 @@ By: BeelzeBruno <brunolcarli@gmail.com>
 import graphene
 from graphql_relay import from_global_id
 
-from users.schema import UserType
+from users.schema import UserType, UserConnection
 from civil_cultural.models import (Portal, Topic, Article, Question, Tag, Rule,
                                     SimilarSuggestion, News, Answer)
 
@@ -36,8 +36,8 @@ class PortalType(graphene.ObjectType):
     topics = graphene.ConnectionField('civil_cultural.schema.TopicConnection')
     news = graphene.ConnectionField('civil_cultural.schema.NewsConnection')
     rules = graphene.ConnectionField('civil_cultural.schema.RuleConnection')
+    users = graphene.ConnectionField(UserConnection)
     # TODO - add Chat
-    # TODO - add Users
     # TODO - add Tags
     # TODO - add Owner(s)
 
@@ -49,6 +49,9 @@ class PortalType(graphene.ObjectType):
 
     def resolve_news(self, info, **kwargs):
         return self.news_set.all()
+
+    def resolve_users(self, info, **kwargs):
+        return self.users.all()
 
 
 class PortalConnection(graphene.relay.Connection):
@@ -1512,6 +1515,42 @@ class DeleteAnswer(graphene.relay.ClientIDMutation):
 
 
 ##########################################################################
+# Other Stuff
+##########################################################################
+class JoinPortal(graphene.relay.ClientIDMutation):
+    """
+    Join a Portal as member.
+    """
+    portal = graphene.Field(PortalType)
+
+    class Input:
+        portal_id = graphene.ID(required=True)
+
+    @access_required
+    def mutate_and_get_payload(self, info, **_input):
+        _id = _input.get('portal_id')
+        object_type, portal_id = from_global_id(_id)
+
+        if not object_type == 'PortalType':
+            raise Exception('Invalid ID: The given ID is not a Portal ID!')
+
+        try:
+            portal = Portal.objects.get(id=portal_id)
+        except Portal.DoesNotExist:
+            raise Exception('Given Portal ID does not exist!')
+
+        # identifica o usuario
+        user = info.context.user
+        if user in portal.users.all():
+            raise Exception('This user is already a member of this portal!')
+        else:
+            portal.users.add(user)
+            portal.save()
+
+        return JoinPortal(portal)
+
+        
+##########################################################################
 # Schema Mutation
 ##########################################################################
 class Mutation:
@@ -1547,3 +1586,6 @@ class Mutation:
     delete_tag = DeleteTag.Field()
     delete_similar_suggestion = DeleteSuggestion.Field()
     delete_answer = DeleteAnswer.Field()
+
+    # Other stuff
+    join_portal = JoinPortal.Field()
