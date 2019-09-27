@@ -1,5 +1,5 @@
 """
-Schema da aplicaçnao civil-cultural.
+Schema da aplicação civil-cultural.
 Este módulo contém:
     - Modelos de objetos graphql;
     - Queries (consultas);
@@ -37,9 +37,10 @@ class PortalType(graphene.ObjectType):
     news = graphene.ConnectionField('civil_cultural.schema.NewsConnection')
     rules = graphene.ConnectionField('civil_cultural.schema.RuleConnection')
     members = graphene.ConnectionField(UserConnection)
+    is_public = graphene.Boolean()
     # TODO - add Chat
     # TODO - add Tags
-    # TODO - add Owner(s)
+    owner = graphene.Field(UserType)
 
     def resolve_topics(self, info, **kwargs):
         return self.topic_set.all()
@@ -449,17 +450,27 @@ class CreatePortal(graphene.relay.ClientIDMutation):
     )
 
     class Input:
-        name = graphene.String(description='Portal title.')
+        name = graphene.String(
+            description='Portal title.',
+            required=True
+        )
+        is_public = graphene.Boolean()
 
     @access_required
     def mutate_and_get_payload(self, info, **_input):
         # captura dos inputs
         name = _input.get('name')
+        is_public = _input.get('is_public', True)
+        # identifica o usuario
+        user = info.context.user
 
         try:
             portal = Portal.objects.create(
                 name=name,
+                owner=user,
+                is_public=is_public
             )
+            portal.users.add(user)
             portal.save()
 
             return CreatePortal(portal)
@@ -931,6 +942,7 @@ class UpdatePortal(graphene.relay.ClientIDMutation):
         name = graphene.String(
             requried=True
         )
+        # TODO add is_public
 
     @access_required
     def mutate_and_get_payload(self, info, **_input):
@@ -1292,6 +1304,8 @@ class DeletePortal(graphene.relay.ClientIDMutation):
     def mutate_and_get_payload(self, info, **_input):
         portal_id = _input.get('id')
         _, portal_id = from_global_id(portal_id)
+
+        # TODO verificar se o user é dono do portal
 
         try:
             portal = Portal.objects.get(id=portal_id)
