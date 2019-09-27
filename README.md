@@ -48,6 +48,26 @@ make run
 
 The system will be disponible at `localhost:8000/graphql/`
 
+# Docker
+
+
+
+ <table align="center"><tr><td align="center" width="9999">
+ 
+```
+                    ##        .            
+              ## ## ##       ==            
+           ## ## ## ##      ===            
+       /""""""""""""""""\___/ ===        
+  ~~~ {~~ ~~~~ ~~~ ~~~~ ~~ ~ /  ===- ~~~   
+       \______ o          __/            
+         \    \        __/             
+          \____\______/                
+```
+
+#### Sorry Docker is under development
+
+</td></tr></table>
 
 # Dev Demo
 
