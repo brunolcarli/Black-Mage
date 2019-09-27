@@ -16,7 +16,7 @@ class Portal(models.Model):
     
     rules = models.ManyToManyField('civil_cultural.Rule')
     # TODO - add Chat
-    # TODO - add Users
+    users = models.ManyToManyField(get_user_model())
     tags = models.ManyToManyField('civil_cultural.Tag')
 
 
