@@ -1,8 +1,21 @@
+"""
+Models da aplicação civil-cultural.
+Este módulo contém a definição das tabelas do banco de dados, gerenciadas
+pelo ORM do django.
+
+Os objetos definidos neste módulo representam o core do sistema, especificando
+os elementos que o compõem e as relações que estes estabelecem entre si.
+"""
 from django.db import models
 from django.contrib.auth import get_user_model
 
 
 class Portal(models.Model):
+    """
+    Um portal é uma área do sistema que engloba a maior parte dos demais
+    objetos. O portal conterá noticias, tópicos, regras próprias, assim como
+    uma temática específica e membros participantes.
+    """
     name = models.CharField(
         max_length=100,
         blank=False,
@@ -26,6 +39,11 @@ class Portal(models.Model):
 
 
 class Topic(models.Model):
+    """
+    Um tópico é uma especificação para um escopo de discussão dentro de um
+    Portal. Os Portais poderão ter tópicos diversos para diferentes assuntos
+    onde serão publicados artigos relacionados à temática definida pelo Tópico.
+    """
     name = models.CharField(
         max_length=100,
         blank=False,
@@ -51,6 +69,13 @@ class Topic(models.Model):
 
 
 class Article(models.Model):
+    """
+    Um artigo é uma publicação realizada por um perito ou especialista no
+    assunto do Tópico. Os artigos são publicados em tópicos de acordo com a
+    especificidade do assunto abordado.
+    Um artigo pode conter perguntas realizadas por membros do Portal, que
+    poderão ser respondidas e classificadas por votos.
+    """
     title = models.CharField(
         max_length=100,
         blank=False,
@@ -96,6 +121,11 @@ class Article(models.Model):
 
 
 class SimilarSuggestion(models.Model):
+    """
+    Uma sugestão similar é uma postagem em um tópico ou notíca agregando
+    informação de outras materias que possuem similaridade com a postagem
+    em questão.
+    """
     class Meta:
         unique_together = ('link', 'post_key')
 
@@ -120,6 +150,10 @@ class SimilarSuggestion(models.Model):
 
 
 class Question(models.Model):
+    """
+    Uma questão (pergunta) é uma publicação em um artigo para resolução de
+    dúvidas que o artigo possa ter levantado.
+    """ 
     post_author = models.ForeignKey(
         get_user_model(),
         on_delete=models.CASCADE,
@@ -161,6 +195,10 @@ class Report(models.Model):
 
 
 class Rule(models.Model):
+    """
+    Uma regra é uma definição que estabelece no Portal uma delimitação
+    que deve ser respeitada pelos membros participantes.
+    """
     class Meta:
         unique_together = ('description', 'portal_reference')
 
@@ -179,6 +217,10 @@ class Rule(models.Model):
 
 
 class Tag(models.Model):
+    """
+    Uma tag é um marcador que classifica uma publicação de acordo com
+    uma temática, é utilizada para filtrar elementos no sistema.
+    """
     reference = models.CharField(
         max_length=80,
         blank=False,
@@ -188,9 +230,9 @@ class Tag(models.Model):
 
 
 class News(models.Model):
-    '''
+    """
     Modelo de dados para publicação de uma notícia.
-    '''
+    """
     title = models.CharField(max_length=100, null=False, blank=False)
     body = models.TextField(null=False, blank=False)
     pro_votes = models.IntegerField(default=0)
@@ -206,6 +248,9 @@ class News(models.Model):
 
 
 class Answer(models.Model):
+    """
+    Definição de uma resposta à uma questão que tenha sido publicada.
+    """
     question = models.ForeignKey(
         Question,
         on_delete=models.CASCADE
