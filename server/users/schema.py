@@ -1,43 +1,62 @@
-from django.contrib.auth import get_user_model
+"""
+Schema contendo objetos de usuário para o sistema.
+Neste módulo ficarão:
+    - Objetos graphql;
+    - Queries (consultas) relacionadas a usuários;
+    - Mutations:
+        + Para cadastro;
+        + LogOut do sistema
 
+By Beelzebruno <brunolcarli@gmail.com>
+"""
 import graphene
 from graphene_django import DjangoObjectType
+from django.contrib.auth import get_user_model
 from users.utils import is_adult, access_required
 from black_list.models import TokenBlackList
 
 
 class UserType(DjangoObjectType):
-    '''Modelo de usuário padrão do django'''
+    """
+    Modelo de usuário padrão do django
+    """ 
     class Meta:
         model = get_user_model()
+        interfaces = (graphene.relay.Node,)
+
+
+class UserConnection(graphene.relay.Connection):
+    """Implementa o relay no objeto User."""
+    class Meta:
+        node = UserType
 
 
 class Query(object):
-    '''
+    """
     Consultas GraphQL delimitando-se ao escopo
     de usuários.
-    '''
-    users = graphene.List(UserType)
+    """
+    users = graphene.relay.ConnectionField(UserConnection)
 
     @access_required
     def resolve_users(self, info, **kwargs):
-        '''
+        """
         Retorna uma lista de todos os usuários registrados no sistema.
-        '''
+        """
         return get_user_model().objects.all()
 
 
 class CreateUser(graphene.relay.ClientIDMutation):
-    '''
+    """
     Cadastra um novo usuário no sistema.
-    '''
+    """
     user = graphene.Field(
         UserType,
         description='The response is a User Object.'
     )
 
     class Input:
-        '''inputs'''
+        """inputs"""
         username = graphene.String(required=True)
         password = graphene.String(required=True)
         email = graphene.String(required=True)
@@ -68,9 +87,9 @@ class CreateUser(graphene.relay.ClientIDMutation):
 
 
 class LogOut(graphene.relay.ClientIDMutation):
-    '''
+    """
     Desloga do sistema.
-    '''
+    """
     response = graphene.String()
 
     @access_required

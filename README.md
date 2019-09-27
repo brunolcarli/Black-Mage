@@ -1,5 +1,5 @@
 <table align="center"><tr><td align="center" width="9999">
-<img src="https://gitlab.com/civil-cultural/black-mage/wikis/uploads/48519f3e4ce26ade568565256fa051bf/custom_2543_close_e09034f8-7345-4bb6-87d5-ae6c4fd33820.jpg" align="center" width="150" alt="Project icon">
+<img src="https://thumbs.gfycat.com/IdioticRepulsiveBorer-size_restricted.gif" align="center" width="80" height="80" alt="Project icon">
 
 # Black Mage API
 
