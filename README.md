@@ -76,7 +76,7 @@ $ make install
 ## Build the container:
 
 ```
-$ docker-compsoe build
+$ docker-compose build
 ```
 
 Run the service:
