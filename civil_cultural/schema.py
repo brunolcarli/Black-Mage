@@ -1607,7 +1607,7 @@ class Mutation:
     create_question = CreateQuestion.Field()
     create_tag = CreateTag.Field()
     create_rule = CreateRule.Field()
-    ceate_news = CreateNews.Field()
+    create_news = CreateNews.Field()
     create_similar_suggestion = CreateSimilarSuggestion.Field()
     create_answer = CreateAnswer.Field()
 
