@@ -28,22 +28,22 @@ Clone this repository to your local machine.
 Make sure your in a activated virtual env, if not familiar with virtualenvs take a look
 at [this article](https://docs.python-guide.org/dev/virtualenvs/).
 
-#### Install the system requirements with the command:
+## Install the system requirements with the command:
 
 ```
-make install
+$ make install
 ```
 
-#### Migrate the database:
+## Migrate the database:
 
 ```
-make migrate
+$ make migrate
 ```
 
 #### Then finnaly, run the service with:
 
 ```
-make run
+$ make run
 ```
 
 The system will be disponible at `localhost:8000/graphql/`
@@ -53,21 +53,38 @@ The system will be disponible at `localhost:8000/graphql/`
 
 
  <table align="center"><tr><td align="center" width="9999">
- 
-```
-                    ##        .            
-              ## ## ##       ==            
-           ## ## ## ##      ===            
-       /""""""""""""""""\___/ ===        
-  ~~~ {~~ ~~~~ ~~~ ~~~~ ~~ ~ /  ===- ~~~   
-       \______ o          __/            
-         \    \        __/             
-          \____\______/                
-```
 
-#### Sorry Docker is under development
+<img src="https://maraaverick.rbind.io/banners/nyan_docker_whale_gfycat.gif" align="center" width="140" height="80" alt="Project icon">
+
 
 </td></tr></table>
+
+Make sure you have `docker-compose` installed. If you dont just run:
+
+## Install docker dependency
+
+```
+$ pip install docker-compose
+```
+
+or within a virtualenv run the requirements installation:
+
+```
+$ make install
+```
+
+## Build the container:
+
+```
+$ docker-compsoe build
+```
+
+Run the service:
+
+```
+$ docker-compose up
+```
+
 
 # Dev Demo
 
