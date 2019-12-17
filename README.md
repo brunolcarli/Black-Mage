@@ -3,11 +3,9 @@
 
 # Black Mage API
 
-[![Generic badge](https://img.shields.io/badge/docs-yellow.svg)](https://gitlab.com/civil-cultural/black-mage/wikis/home)
+[![Generic badge](https://img.shields.io/badge/docs-yellow.svg)](https://github.com/brunolcarli/Black-Mage/wiki)
 
-> "Although ill-suited for wielding weapons, Black Mages easily bend destructive black magic spells to their will."
-
-> ~ Dawn of Souls instructions
+> "Although ill-suited for wielding weapons, Black Mages easily bend destructive black magic spells to their will." ~ Dawn of Souls instructions
 
 API Server
 </td></tr></table>
