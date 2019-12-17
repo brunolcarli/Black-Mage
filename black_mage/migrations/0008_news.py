@@ -9,7 +9,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('civil_cultural', '0007_rule_portal_reference'),
+        ('black_mage', '0007_rule_portal_reference'),
     ]
 
     operations = [
@@ -22,7 +22,7 @@ class Migration(migrations.Migration):
                 ('votes', models.IntegerField(default=0)),
                 ('publication_date', models.DateTimeField(auto_now_add=True)),
                 ('author', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL)),
-                ('portal', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='civil_cultural.Portal')),
+                ('portal', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='black_mage.Portal')),
             ],
         ),
     ]

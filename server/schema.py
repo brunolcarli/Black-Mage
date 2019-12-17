@@ -3,20 +3,20 @@ import graphql_jwt
 
 # import chatbot.schema as chatbot
 import users.schema as users
-import civil_cultural.schema as civil_cultural
+import black_mage.schema as black_mage
 
 queries = (
     graphene.ObjectType,
     # chatbot.Query,
     users.Query,
-    civil_cultural.Query,
+    black_mage.Query,
 )
 
 mutations = (
     graphene.ObjectType,
     # chatbot.Mutation,
     users.Mutation,
-    civil_cultural.Mutation,
+    black_mage.Mutation,
 )
 
 class Query(*queries):

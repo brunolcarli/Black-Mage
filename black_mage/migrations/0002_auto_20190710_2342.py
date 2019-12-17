@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('civil_cultural', '0001_initial'),
+        ('black_mage', '0001_initial'),
     ]
 
     operations = [
@@ -20,26 +20,26 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='article',
             name='questions',
-            field=models.ManyToManyField(to='civil_cultural.Question'),
+            field=models.ManyToManyField(to='black_mage.Question'),
         ),
         migrations.AddField(
             model_name='article',
             name='reports',
-            field=models.ManyToManyField(to='civil_cultural.Report'),
+            field=models.ManyToManyField(to='black_mage.Report'),
         ),
         migrations.AddField(
             model_name='portal',
             name='rules',
-            field=models.ManyToManyField(to='civil_cultural.Rule'),
+            field=models.ManyToManyField(to='black_mage.Rule'),
         ),
         migrations.AddField(
             model_name='portal',
             name='topics',
-            field=models.ManyToManyField(to='civil_cultural.Topic'),
+            field=models.ManyToManyField(to='black_mage.Topic'),
         ),
         migrations.AddField(
             model_name='topic',
             name='articles',
-            field=models.ManyToManyField(to='civil_cultural.Article'),
+            field=models.ManyToManyField(to='black_mage.Article'),
         ),
     ]

@@ -9,7 +9,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('civil_cultural', '0013_auto_20190715_0143'),
+        ('black_mage', '0013_auto_20190715_0143'),
     ]
 
     operations = [
@@ -23,7 +23,7 @@ class Migration(migrations.Migration):
                 ('publish_datetime', models.DateTimeField(auto_now_add=True)),
                 ('post_key', models.CharField(max_length=50)),
                 ('author', models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to=settings.AUTH_USER_MODEL)),
-                ('question', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='civil_cultural.Question')),
+                ('question', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='black_mage.Question')),
             ],
         ),
     ]

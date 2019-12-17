@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('civil_cultural', '0011_auto_20190715_0052'),
+        ('black_mage', '0011_auto_20190715_0052'),
     ]
 
     operations = [
         migrations.AddField(
             model_name='news',
             name='similar_suggestions',
-            field=models.ManyToManyField(to='civil_cultural.SimilarSuggestion'),
+            field=models.ManyToManyField(to='black_mage.SimilarSuggestion'),
         ),
     ]

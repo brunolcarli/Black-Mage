@@ -1,5 +1,5 @@
 """
-Schema da aplicação civil-cultural.
+Schema da aplicação black mage.
 Este módulo contém:
     - Modelos de objetos graphql;
     - Queries (consultas);
@@ -14,7 +14,7 @@ import graphene
 from graphql_relay import from_global_id
 
 from users.schema import UserType, UserConnection
-from civil_cultural.models import (Portal, Topic, Article, Question, Tag, Rule,
+from black_mage.models import (Portal, Topic, Article, Question, Tag, Rule,
                                     SimilarSuggestion, News, Answer)
 
 from users.utils import access_required
@@ -33,9 +33,9 @@ class PortalType(graphene.ObjectType):
 
     name = graphene.String()
     founding_datetime = graphene.DateTime()
-    topics = graphene.ConnectionField('civil_cultural.schema.TopicConnection')
-    news = graphene.ConnectionField('civil_cultural.schema.NewsConnection')
-    rules = graphene.ConnectionField('civil_cultural.schema.RuleConnection')
+    topics = graphene.ConnectionField('black_mage.schema.TopicConnection')
+    news = graphene.ConnectionField('black_mage.schema.NewsConnection')
+    rules = graphene.ConnectionField('black_mage.schema.RuleConnection')
     members = graphene.ConnectionField(UserConnection)
     is_public = graphene.Boolean()
     # TODO - add Chat
@@ -76,7 +76,7 @@ class TopicType(graphene.ObjectType):
     )
     # TODO - add Tags
     articles = graphene.List(
-        'civil_cultural.schema.ArticleType'
+        'black_mage.schema.ArticleType'
     )
 
     def resolve_portal(self, info, **kwargs):
@@ -113,12 +113,12 @@ class ArticleType(graphene.ObjectType):
     cons_votes = graphene.Int()
     references = graphene.String()
     questions = graphene.ConnectionField(
-        'civil_cultural.schema.QuestionConnection'
+        'black_mage.schema.QuestionConnection'
     )
     # TODO add tags
     # TODO reports
     similar_suggestions = graphene.ConnectionField(
-        'civil_cultural.schema.SimilarSuggestionConnection'
+        'black_mage.schema.SimilarSuggestionConnection'
     )
 
     def resolve_article_authors(self, info, **kwargs):
@@ -152,9 +152,9 @@ class QuestionType(graphene.ObjectType):
     pro_votes = graphene.Int()
     cons_votes = graphene.Int()
     publish_datetime = graphene.DateTime()
-    article = graphene.Field('civil_cultural.schema.ArticleType')
+    article = graphene.Field('black_mage.schema.ArticleType')
     answers = graphene.relay.ConnectionField(
-        'civil_cultural.schema.AnswerConnection'
+        'black_mage.schema.AnswerConnection'
     )
 
     def resolve_article(self, info, **kwargs):
@@ -237,7 +237,7 @@ class NewsType(graphene.ObjectType):
         PortalType
     )
     similar_suggestions = graphene.ConnectionField(
-        'civil_cultural.schema.SimilarSuggestionConnection'
+        'black_mage.schema.SimilarSuggestionConnection'
     )
     # TODO question
 
@@ -314,7 +314,7 @@ class AnswerConnection(graphene.relay.Connection):
 ##########################################################################
 class Query(object):
     """
-    Queries for civil_cultural.
+    Queries for black_mage.
     """
     node = graphene.relay.Node.Field()
 
@@ -325,7 +325,7 @@ class Query(object):
     @access_required
     def resolve_portals(self, info, **kwargs):
         """
-        Returns all portals from civil cultural.
+        Returns all portals from black mage.
         """
         return Portal.objects.all()
 
@@ -336,7 +336,7 @@ class Query(object):
     @access_required
     def resolve_topics(self, info, **kwargs):
         """
-        Returns all topics from civil cultural.
+        Returns all topics from black mage.
         """
         return Topic.objects.all()
 

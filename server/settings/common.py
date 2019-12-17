@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     'graphene_django',
     # 'chatbot',
     'black_list',
-    'civil_cultural',
+    'black_mage',
     'corsheaders',
 ]
 

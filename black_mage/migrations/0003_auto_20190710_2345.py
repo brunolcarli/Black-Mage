@@ -6,23 +6,23 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('civil_cultural', '0002_auto_20190710_2342'),
+        ('black_mage', '0002_auto_20190710_2342'),
     ]
 
     operations = [
         migrations.AddField(
             model_name='article',
             name='similar_suggestions',
-            field=models.ManyToManyField(to='civil_cultural.SimilarSuggestion'),
+            field=models.ManyToManyField(to='black_mage.SimilarSuggestion'),
         ),
         migrations.AddField(
             model_name='article',
             name='tags',
-            field=models.ManyToManyField(to='civil_cultural.Tag'),
+            field=models.ManyToManyField(to='black_mage.Tag'),
         ),
         migrations.AddField(
             model_name='portal',
             name='tags',
-            field=models.ManyToManyField(to='civil_cultural.Tag'),
+            field=models.ManyToManyField(to='black_mage.Tag'),
         ),
     ]

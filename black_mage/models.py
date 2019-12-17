@@ -1,5 +1,5 @@
 """
-Models da aplicação civil-cultural.
+Models da aplicação black mage.
 Este módulo contém a definição das tabelas do banco de dados, gerenciadas
 pelo ORM do django.
 
@@ -25,12 +25,12 @@ class Portal(models.Model):
     founding_datetime = models.DateTimeField(
         auto_now_add=True
     )
-    topics = models.ManyToManyField('civil_cultural.Topic')
+    topics = models.ManyToManyField('black_mage.Topic')
     is_public = models.BooleanField(default=True)
-    rules = models.ManyToManyField('civil_cultural.Rule')
+    rules = models.ManyToManyField('black_mage.Rule')
     # TODO - add Chat
     users = models.ManyToManyField(get_user_model())
-    tags = models.ManyToManyField('civil_cultural.Tag')
+    tags = models.ManyToManyField('black_mage.Tag')
     owner = models.ForeignKey(
         get_user_model(),
         on_delete=models.CASCADE,
@@ -60,9 +60,9 @@ class Topic(models.Model):
     creation_datetime = models.DateTimeField(
         auto_now_add=True
     )
-    articles = models.ManyToManyField('civil_cultural.Article')
+    articles = models.ManyToManyField('black_mage.Article')
     topic_portal = models.ForeignKey(
-        'civil_cultural.Portal',
+        'black_mage.Portal',
         on_delete=models.CASCADE,
     )
     # TODO - add Tag
@@ -108,14 +108,14 @@ class Article(models.Model):
     publication_date = models.DateField(
         auto_now_add=True
     )
-    questions = models.ManyToManyField('civil_cultural.Question')
-    tags = models.ManyToManyField('civil_cultural.Tag')
-    reports = models.ManyToManyField('civil_cultural.Report')
+    questions = models.ManyToManyField('black_mage.Question')
+    tags = models.ManyToManyField('black_mage.Tag')
+    reports = models.ManyToManyField('black_mage.Report')
     similar_suggestions = models.ManyToManyField(
-        'civil_cultural.SimilarSuggestion'
+        'black_mage.SimilarSuggestion'
     )
     published_topic= models.ForeignKey(
-        'civil_cultural.Topic',
+        'black_mage.Topic',
         on_delete=models.CASCADE
     )
 
@@ -170,10 +170,10 @@ class Question(models.Model):
         auto_now_add=True
     )
     published_article = models.ForeignKey(
-        'civil_cultural.Article',
+        'black_mage.Article',
         on_delete=models.CASCADE
     )
-    # answers = models.ManyToManyField('civil_cultural.Answer')
+    # answers = models.ManyToManyField('black_mage.Answer')
 
 
 class Report(models.Model):
