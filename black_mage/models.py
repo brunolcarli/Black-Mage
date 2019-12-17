@@ -1,5 +1,5 @@
 """
-Models da aplicação civil-cultural.
+Models da aplicação black mage.
 Este módulo contém a definição das tabelas do banco de dados, gerenciadas
 pelo ORM do django.
 

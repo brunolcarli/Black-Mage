@@ -1,5 +1,5 @@
 """
-Schema da aplicação civil-cultural.
+Schema da aplicação black mage.
 Este módulo contém:
     - Modelos de objetos graphql;
     - Queries (consultas);
@@ -325,7 +325,7 @@ class Query(object):
     @access_required
     def resolve_portals(self, info, **kwargs):
         """
-        Returns all portals from civil cultural.
+        Returns all portals from black mage.
         """
         return Portal.objects.all()
 
@@ -336,7 +336,7 @@ class Query(object):
     @access_required
     def resolve_topics(self, info, **kwargs):
         """
-        Returns all topics from civil cultural.
+        Returns all topics from black mage.
         """
         return Topic.objects.all()
 
