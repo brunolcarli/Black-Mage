@@ -20,7 +20,6 @@ from black_mage.models import (Portal, Topic, Article, Question, Tag, Rule,
 from users.utils import access_required
 
 
-
 ##########################################################################
 # GraphQl Objects
 ##########################################################################
