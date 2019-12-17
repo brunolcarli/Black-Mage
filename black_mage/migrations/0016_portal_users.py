@@ -8,7 +8,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('civil_cultural', '0015_remove_answer_post_key'),
+        ('black_mage', '0015_remove_answer_post_key'),
     ]
 
     operations = [

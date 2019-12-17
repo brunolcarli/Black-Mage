@@ -7,14 +7,14 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('civil_cultural', '0005_article_published_topic'),
+        ('black_mage', '0005_article_published_topic'),
     ]
 
     operations = [
         migrations.AddField(
             model_name='question',
             name='published_article',
-            field=models.ForeignKey(default=None, on_delete=django.db.models.deletion.CASCADE, to='civil_cultural.Article'),
+            field=models.ForeignKey(default=None, on_delete=django.db.models.deletion.CASCADE, to='black_mage.Article'),
             preserve_default=False,
         ),
     ]

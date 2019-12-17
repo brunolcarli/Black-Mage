@@ -9,7 +9,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('civil_cultural', '0016_portal_users'),
+        ('black_mage', '0016_portal_users'),
     ]
 
     operations = [
